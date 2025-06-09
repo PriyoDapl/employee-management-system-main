@@ -74,7 +74,14 @@ const ProjectAssignments = ({ user, onBack }) => {
       }
 
       const data = await response.json();
-      setAssignments(data.assignments || []);
+      const fetchedAssignments = data.assignments || [];
+      setAssignments(fetchedAssignments);
+      
+      // Check for orphaned assignments (assignments with deleted projects)
+      const orphanedAssignments = fetchedAssignments.filter(assignment => !assignment.projectId);
+      if (orphanedAssignments.length > 0) {
+        setError(`Found ${orphanedAssignments.length} assignment(s) with deleted projects. These have been filtered from the view. Click "Clean Up" to remove them permanently.`);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -131,9 +138,56 @@ const ProjectAssignments = ({ user, onBack }) => {
     setDeleteConfirmation({ isOpen: false, assignment: null });
   };
 
+  const cleanupOrphanedAssignments = async () => {
+    if (typeof window === "undefined") {
+      setError("Browser environment required");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    const orphanedAssignments = assignments.filter(assignment => !assignment.projectId);
+    
+    if (orphanedAssignments.length === 0) {
+      setSuccess("No orphaned assignments found.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Remove orphaned assignments one by one
+      const promises = orphanedAssignments.map(assignment =>
+        fetch(`/api/management/projects/assign/${assignment._id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+      );
+
+      const results = await Promise.all(promises);
+      const successCount = results.filter(response => response.ok).length;
+      
+      if (successCount === orphanedAssignments.length) {
+        setSuccess(`Successfully cleaned up ${successCount} orphaned assignment(s).`);
+      } else {
+        setError(`Cleaned up ${successCount} out of ${orphanedAssignments.length} orphaned assignments.`);
+      }
+      
+      fetchAssignments(); // Refresh assignments list
+    } catch (error) {
+      console.error("Error cleaning up orphaned assignments:", error);
+      setError("Error cleaning up orphaned assignments");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Group assignments by project for better visualization
-  const groupedAssignments = assignments.reduce((acc, assignment) => {
-    const projectId = assignment.projectId?._id;
+  // Filter out assignments with deleted projects first
+  const validAssignments = assignments.filter(assignment => assignment.projectId && assignment.projectId._id);
+  
+  const groupedAssignments = validAssignments.reduce((acc, assignment) => {
+    const projectId = assignment.projectId._id;
     if (!acc[projectId]) {
       acc[projectId] = {
         project: assignment.projectId,
@@ -198,7 +252,22 @@ const ProjectAssignments = ({ user, onBack }) => {
 
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
+          <Alert 
+            severity="error" 
+            sx={{ mb: 3 }}
+            action={
+              error.includes("assignment(s) with deleted projects") ? (
+                <Button 
+                  color="inherit" 
+                  size="small" 
+                  onClick={cleanupOrphanedAssignments}
+                  disabled={loading}
+                >
+                  Clean Up
+                </Button>
+              ) : null
+            }
+          >
             {error}
           </Alert>
         )}
@@ -218,7 +287,7 @@ const ProjectAssignments = ({ user, onBack }) => {
                   sx={{ fontSize: 40, color: "primary.main", mb: 1 }}
                 />
                 <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-                  {assignments.length}
+                  {validAssignments.length}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Total Assignments
@@ -245,7 +314,7 @@ const ProjectAssignments = ({ user, onBack }) => {
             <Card>
               <CardContent sx={{ textAlign: "center" }}>
                 <Badge
-                  badgeContent={assignments.length}
+                  badgeContent={validAssignments.length}
                   color="primary"
                   max={999}
                 >
@@ -254,7 +323,7 @@ const ProjectAssignments = ({ user, onBack }) => {
                   />
                 </Badge>
                 <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-                  {new Set(assignments.map((a) => a.employeeId?._id)).size}
+                  {new Set(validAssignments.map((a) => a.employeeId?._id)).size}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Assigned Employees
@@ -273,7 +342,7 @@ const ProjectAssignments = ({ user, onBack }) => {
           Project Assignments Overview
         </Typography>
 
-        {assignments.length === 0 ? (
+        {validAssignments.length === 0 ? (
           <Paper sx={{ p: 6, textAlign: "center" }}>
             <AssignmentIcon sx={{ fontSize: 80, color: "grey.400", mb: 2 }} />
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -287,7 +356,7 @@ const ProjectAssignments = ({ user, onBack }) => {
           <Box>
             {Object.values(groupedAssignments).map((projectGroup) => (
               <Paper
-                key={projectGroup.project._id}
+                key={projectGroup.project?._id || 'unknown-project'}
                 sx={{ mb: 3, overflow: "hidden" }}
               >
                 <Box
@@ -298,10 +367,10 @@ const ProjectAssignments = ({ user, onBack }) => {
                   }}
                 >
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                    {projectGroup.project.name}
+                    {projectGroup.project?.name || "Project Missing"}
                   </Typography>
                   <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    {projectGroup.project.details}
+                    {projectGroup.project?.details || "No project details available"}
                   </Typography>
                   <Box  sx={{ mt: 2, display: "flex", alignItems: "center" }}>
                     <Chip
@@ -309,10 +378,12 @@ const ProjectAssignments = ({ user, onBack }) => {
                         projectGroup.assignments.length !== 1 ? "s" : ""
                       } Assigned`}
                       clickable={false}
+                      onClick={undefined}
                       sx={{
                         bgcolor: "rgba(255,255,255,0.2)",
                         color: "white",
                         fontWeight: 500,
+                        pointerEvents: "none",
                       }}
                     />
                   </Box>
@@ -371,8 +442,7 @@ const ProjectAssignments = ({ user, onBack }) => {
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2">
-                              {assignment.assignedBy?.firstName}{" "}
-                              {assignment.assignedBy?.lastName}
+                              {assignment.assignedBy?.email}
                             </Typography>
                           </TableCell>
                           <TableCell>

@@ -194,7 +194,13 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
   const renderSkills = () => {
     if (!existingSkills || existingSkills.length === 0) {
       return (
-        <Typography variant="body2" color="text.secondary">
+        <Typography 
+          variant="body1" 
+          sx={{
+            color: "text.secondary",
+            fontStyle: "italic",
+          }}
+        >
           No skills listed
         </Typography>
       );
@@ -206,12 +212,20 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
           <Chip
             key={index}
             label={skill}
-            variant="outlined"
-            size="small"
             sx={{
-              borderColor: "primary.main",
+              bgcolor: "primary.50",
               color: "primary.main",
+              border: "1px solid",
+              borderColor: "primary.200",
+              fontWeight: 500,
+              fontSize: "0.875rem",
+              pointerEvents: "none",
+              
+              "&:hover": {
+                bgcolor: "primary.100",
+              },
             }}
+            size="medium"
           />
         ))}
       </Box>
@@ -317,7 +331,16 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
           </Alert>
         )}
 
-        <Paper sx={{ p: 4 }}>
+        <Paper 
+          elevation={3}
+          sx={{ 
+            p: 4, 
+            borderRadius: 3,
+            bgcolor: "white",
+            border: "1px solid",
+            borderColor: "grey.200",
+          }}
+        >
           <Typography
             variant="h5"
             component="h2"
@@ -329,313 +352,694 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
 
           {isViewMode && profileExists ? (
             // View Mode - Show details as read-only
-            <Grid container spacing={3}>
+            <Grid container spacing={4}>
+              {/* Basic Information Section */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ color: "text.primary", fontWeight: 500 }}
+                <Paper
+                  elevation={2}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: "white",
+                    border: "1px solid",
+                    borderColor: "grey.200",
+                  }}
                 >
-                  Basic Information
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Employee ID
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.employeeId || "Not assigned"}
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      color: "primary.main",
+                      fontWeight: 600,
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    Basic Information
                   </Typography>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Employee ID
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.employeeId || "Not assigned"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          First Name
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.firstName || "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Last Name
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.lastName || "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  First Name
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.firstName || "Not provided"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Last Name
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.lastName || "Not provided"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Department
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.department || "Not assigned"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Position
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.position || "Not assigned"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Salary (INR)
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.salary
-                      ? `₹${parseInt(formData.salary).toLocaleString()}`
-                      : "Not disclosed"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Hire Date
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.hireDate
-                      ? new Date(formData.hireDate).toLocaleDateString()
-                      : "Not provided"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
+              {/* Work Information Section */}
               <Grid item xs={12}>
-                <Typography
-                  variant="h6"
-                  gutterBottom
-                  sx={{ color: "text.primary", fontWeight: 500, mt: 2 }}
+                <Paper
+                  elevation={2}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: "white",
+                    border: "1px solid",
+                    borderColor: "grey.200",
+                  }}
                 >
-                  Personal Information
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Phone
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.phone || "Not provided"}
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      color: "primary.main",
+                      fontWeight: 600,
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    Work Information
                   </Typography>
+
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Department
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.department || "Not assigned"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Position
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.position || "Not assigned"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Salary (INR)
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography 
+                            variant="body1" 
+                            sx={{ 
+                              fontWeight: 500,
+                              color: formData.salary ? "success.main" : "text.secondary"
+                            }}
+                          >
+                            {formData.salary
+                              ? `₹${parseInt(formData.salary).toLocaleString()}`
+                              : "Not disclosed"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Hire Date
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.hireDate
+                              ? new Date(formData.hireDate).toLocaleDateString("en-US", {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })
+                              : "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Paper>
               </Grid>
 
-              <Grid item xs={12} sm={6}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Emergency Contact
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.emergencyContact || "Not provided"}
-                  </Typography>
-                </Paper>
-              </Grid>
-
+              {/* Personal Information Section */}
               <Grid item xs={12}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Address
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  <Typography variant="body1">
-                    {formData.address || "Not provided"}
+                <Paper
+                  elevation={2}
+                  sx={{
+                    p: 3,
+                    borderRadius: 3,
+                    bgcolor: "white",
+                    border: "1px solid",
+                    borderColor: "grey.200",
+                  }}
+                >
+                  <Typography
+                    variant="h6"
+                    gutterBottom
+                    sx={{
+                      color: "primary.main",
+                      fontWeight: 600,
+                      mb: 3,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    Personal Information
                   </Typography>
-                </Paper>
-              </Grid>
 
-              <Grid item xs={12}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Skills
-                </Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: "grey.50" }}>
-                  {renderSkills()}
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Phone Number
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.phone || "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Emergency Contact
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.emergencyContact || "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Address
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                            {formData.address || "Not provided"}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Box sx={{ mb: 2 }}>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{ fontWeight: 500, mb: 1 }}
+                        >
+                          Skills & Expertise
+                        </Typography>
+                        <Paper
+                          variant="outlined"
+                          sx={{
+                            p: 2,
+                            bgcolor: "grey.50",
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: "grey.200",
+                          }}
+                        >
+                          {renderSkills()}
+                        </Paper>
+                      </Box>
+                    </Grid>
+                  </Grid>
                 </Paper>
               </Grid>
             </Grid>
           ) : (
             // Form Mode - For adding new profile or editing (management only)
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-              <Grid container spacing={3}>
+              <Grid container spacing={4}>
+                {/* Basic Information Section */}
                 <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "text.primary", fontWeight: 500 }}
-                  >
-                    Basic Information
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="firstName"
-                    label="First Name *"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                    variant="outlined"
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="lastName"
-                    label="Last Name *"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    variant="outlined"
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="employeeId"
-                    label="Employee ID"
-                    value={formData.employeeId}
-                    onChange={handleChange}
-                    variant="outlined"
-                    placeholder="Auto-generated if empty"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="department"
-                    label="Department *"
-                    value={formData.department}
-                    onChange={handleChange}
-                    variant="outlined"
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="position"
-                    label="Position *"
-                    value={formData.position}
-                    onChange={handleChange}
-                    variant="outlined"
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="salary"
-                    label="Salary (INR)"
-                    type="number"
-                    value={formData.salary}
-                    onChange={handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="hireDate"
-                    label="Hire Date *"
-                    type="date"
-                    value={formData.hireDate}
-                    onChange={handleChange}
-                    variant="outlined"
-                    InputLabelProps={{
-                      shrink: true,
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      bgcolor: "white",
+                      border: "1px solid",
+                      borderColor: "grey.200",
                     }}
-                    required
-                  />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "text.primary", fontWeight: 500, mt: 2 }}
                   >
-                    Personal Information
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        color: "primary.main",
+                        fontWeight: 600,
+                        mb: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      Basic Information
+                    </Typography>
+
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="firstName"
+                          label="First Name *"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          variant="outlined"
+                          required
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="lastName"
+                          label="Last Name *"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          variant="outlined"
+                          required
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="employeeId"
+                          label="Employee ID"
+                          value={formData.employeeId}
+                          onChange={handleChange}
+                          variant="outlined"
+                          placeholder="Auto-generated if empty"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="phone"
-                    label="Phone Number"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    name="emergencyContact"
-                    label="Emergency Contact"
-                    value={formData.emergencyContact}
-                    onChange={handleChange}
-                    variant="outlined"
-                  />
-                </Grid>
-
+                {/* Work Information Section */}
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    name="address"
-                    label="Address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    variant="outlined"
-                    multiline
-                    rows={2}
-                  />
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      bgcolor: "white",
+                      border: "1px solid",
+                      borderColor: "grey.200",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        color: "primary.main",
+                        fontWeight: 600,
+                        mb: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      Work Information
+                    </Typography>
+
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="department"
+                          label="Department *"
+                          value={formData.department}
+                          onChange={handleChange}
+                          variant="outlined"
+                          required
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="position"
+                          label="Position *"
+                          value={formData.position}
+                          onChange={handleChange}
+                          variant="outlined"
+                          required
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="salary"
+                          label="Salary (INR)"
+                          type="number"
+                          value={formData.salary}
+                          onChange={handleChange}
+                          variant="outlined"
+                          InputProps={{
+                            startAdornment: (
+                              <Typography sx={{ mr: 1 }}>₹</Typography>
+                            ),
+                          }}
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="hireDate"
+                          label="Hire Date *"
+                          type="date"
+                          value={formData.hireDate}
+                          onChange={handleChange}
+                          variant="outlined"
+                          InputLabelProps={{
+                            shrink: true,
+                          }}
+                          required
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 </Grid>
 
+                {/* Personal Information Section */}
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    name="skills"
-                    label="Skills (comma-separated)"
-                    value={formData.skills}
-                    onChange={handleChange}
-                    variant="outlined"
-                    placeholder="e.g., JavaScript, React, Node.js"
-                    multiline
-                    rows={2}
-                  />
+                  <Paper
+                    elevation={2}
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      bgcolor: "white",
+                      border: "1px solid",
+                      borderColor: "grey.200",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{
+                        color: "primary.main",
+                        fontWeight: 600,
+                        mb: 3,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      Personal Information
+                    </Typography>
+
+                    <Grid container spacing={3}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="phone"
+                          label="Phone Number"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          variant="outlined"
+                          placeholder="e.g., +91 9876543210"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="emergencyContact"
+                          label="Emergency Contact"
+                          value={formData.emergencyContact}
+                          onChange={handleChange}
+                          variant="outlined"
+                          placeholder="e.g., +91 9876543210"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          name="address"
+                          label="Address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          variant="outlined"
+                          multiline
+                          rows={2}
+                          placeholder="Street address"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+
+                      <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          name="skills"
+                          label="Skills (comma-separated)"
+                          value={formData.skills}
+                          onChange={handleChange}
+                          variant="outlined"
+                          placeholder="e.g., JavaScript, React, Node.js, Python"
+                          multiline
+                          rows={2}
+                          helperText="Enter skills separated by commas"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                  </Paper>
                 </Grid>
 
                 <Grid item xs={12}>
@@ -644,7 +1048,18 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
                       type="submit"
                       variant="contained"
                       disabled={loading}
-                      sx={{ minWidth: 120 }}
+                      sx={{ 
+                        minWidth: 120,
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        textTransform: "none",
+                        bgcolor: "primary.main",
+                        "&:hover": {
+                          bgcolor: "primary.dark",
+                          transform: "translateY(-1px)",
+                        },
+                        transition: "all 0.2s",
+                      }}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
@@ -660,6 +1075,17 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
                       variant="outlined"
                       onClick={onBack}
                       disabled={loading}
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: 500,
+                        textTransform: "none",
+                        borderColor: "grey.300",
+                        color: "text.primary",
+                        "&:hover": {
+                          borderColor: "grey.400",
+                          bgcolor: "grey.50",
+                        },
+                      }}
                     >
                       Back to Dashboard
                     </Button>

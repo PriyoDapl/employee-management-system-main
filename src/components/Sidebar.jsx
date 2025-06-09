@@ -453,7 +453,7 @@ const Sidebar = ({
             sx={{
               fontWeight: 600,
               fontSize: isCollapsed ? "1.25rem" : "1rem",
-              lineHeight: isCollapsed ? "2.3" : "1.9",
+              lineHeight: isCollapsed ? "2.35" : "2",
               whiteSpace: isCollapsed ? "nowrap" : "nowrap",
               position: "relative",
               zIndex: 1,

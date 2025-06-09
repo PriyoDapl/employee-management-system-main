@@ -208,8 +208,7 @@ const MyProjects = ({ user, onBack }) => {
                     {assignment.assignedBy && (
                       <Box sx={{ mb: 2 }}>
                         <Typography variant="caption" color="text.secondary">
-                          Assigned by: {assignment.assignedBy.firstName}{" "}
-                          {assignment.assignedBy.lastName}
+                          Assigned by: {assignment.assignedBy.email}
                         </Typography>
                       </Box>
                     )}

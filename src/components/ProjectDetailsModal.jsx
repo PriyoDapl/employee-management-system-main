@@ -122,9 +122,6 @@ const ProjectDetailsModal = ({ assignment, open, onClose }) => {
                   Assigned By
                 </Typography>
                 <Typography variant="body1">
-                  {assignedBy.firstName} {assignedBy.lastName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
                   {assignedBy.email}
                 </Typography>
               </Box>
