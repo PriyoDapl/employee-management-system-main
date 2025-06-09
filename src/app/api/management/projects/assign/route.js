@@ -147,7 +147,7 @@ export async function GET(request) {
 
     // Fetch all assignments with populated data
     const assignments = await ProjectAssignment.find({})
-      .populate("projectId", "name details createdAt")
+      .populate("projectId", "name details createdAt isActive")
       .populate("employeeId", "firstName lastName email")
       .populate("assignedBy", "firstName lastName email")
       .sort({ assignedDate: -1 });

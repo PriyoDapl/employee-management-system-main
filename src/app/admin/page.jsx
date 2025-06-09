@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   if (!user) {
     return <LoadingScreen />;
   }
-  // For demo purposes - in real app you'd check user.role === 'admin'
+  // If user is not management show access denied message
   if (user.role !== "management") {
     return (
       <Box

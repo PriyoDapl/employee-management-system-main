@@ -565,7 +565,7 @@ const EmployeeDetails = ({ user, onBack, hasExistingProfile }) => {
                             variant="body1" 
                             sx={{ 
                               fontWeight: 500,
-                              color: formData.salary ? "success.main" : "text.secondary"
+                              color: "text.primary",
                             }}
                           >
                             {formData.salary

@@ -117,44 +117,6 @@ export async function PUT(request, { params }) {
   }
 }
 
-// DELETE - Delete project
-export async function DELETE(request, { params }) {
-  try {
-    // Verify token
-    const decoded = getAuthenticatedUser(request);
-    
-    await dbConnect();
-
-    const { id } = params;
-
-    // Find the project
-    const project = await Project.findById(id);
-    if (!project) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Project not found' 
-        },
-        { status: 404 }
-      );
-    }
-
-    // Delete the project permanently
-    await Project.findByIdAndDelete(id);
-
-    return NextResponse.json({
-      success: true,
-      message: 'Project deleted successfully'
-    });
-
-  } catch (error) {
-    console.error('DELETE /api/projects/[id] error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: error.message || 'Failed to delete project'
-      },
-      { status: error.message === 'Invalid token' ? 401 : 500 }
-    );
-  }
-}
+// DELETE functionality has been removed
+// Projects are now managed through active/inactive status
+// Use the /api/projects/[id]/toggle-status endpoint instead

@@ -16,6 +16,7 @@ import {
   AppBar,
   Toolbar,
   IconButton,
+  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBackIos";
 import ProjectDetailsModal from "./ProjectDetailsModal";
@@ -52,9 +53,12 @@ const AssignedProjects = ({ user, onBack, onProjectCountChange }) => {
       const newAssignments = data.assignments || [];
       setAssignments(newAssignments);
 
-      // Notify parent component of project count change
+      // Notify parent component of active project count only
       if (onProjectCountChange) {
-        onProjectCountChange(newAssignments.length);
+        const activeProjectCount = newAssignments.filter(
+          assignment => assignment.projectId?.isActive !== false
+        ).length;
+        onProjectCountChange(activeProjectCount);
       }
     } catch (err) {
       setError(err.message);
@@ -150,102 +154,161 @@ const AssignedProjects = ({ user, onBack, onProjectCountChange }) => {
             </Typography>
           </Paper>
         ) : (
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             {assignments.map((assignment) => (
-              <Grid item xs={12} md={6} lg={4} key={assignment._id}>
+              <Grid item key={assignment._id}>
                 <Card
                   sx={{
+                    width: 320,
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    transition: "all 0.2s",
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 2,
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
                     "&:hover": {
-                      transform: "translateY(-2px)",
-                      boxShadow: 4,
+                      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.12)",
                     },
                   }}
                 >
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography
-                      variant="h6"
-                      component="h3"
-                      gutterBottom
-                      sx={{
-                        fontWeight: 600,
-                        color: "primary.main",
-                        mb: 2,
-                      }}
-                    >
-                      {assignment.projectId?.name || "Unnamed Project"}
-                    </Typography>
-
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{
-                        mb: 2,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 3,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {assignment.projectId?.details || "No details available"}
-                    </Typography>
-
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        Assigned:{" "}
-                        {new Date(assignment.assignedDate).toLocaleDateString()}
+                  <CardContent sx={{ flexGrow: 1, p: 3 }}>
+                    <Box sx={{ mb: 2.5 }}>
+                      <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", mb: 1 }}>
+                        <Typography
+                          variant="h6"
+                          component="h3"
+                          noWrap
+                          sx={{
+                            fontWeight: 600,
+                            fontSize: "1.1rem",
+                            lineHeight: 1.3,
+                            color: assignment.projectId?.isActive === false 
+                              ? "text.secondary" 
+                              : "text.primary",
+                            flex: 1,
+                            pr: 1,
+                          }}
+                        >
+                          {assignment.projectId?.name || "Unnamed Project"}
+                        </Typography>
+                        <Chip
+                          label={assignment.projectId?.isActive === false ? "Inactive" : "Active"}
+                          variant="outlined"
+                          size="small"
+                          color={assignment.projectId?.isActive === false ? "default" : "success"}
+                          sx={{ 
+                            fontSize: "0.75rem",
+                            height: 24,
+                            pointerEvents: "none",
+                            "& .MuiChip-label": { px: 1 }
+                          }}
+                        />
+                      </Box>
+                      
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {assignment.projectId?.details || "No description available"}
                       </Typography>
                     </Box>
 
-                    <Box sx={{ mb: 2 }}>
-                      <Typography variant="caption" color="text.secondary">
-                        Project Created:{" "}
-                        {new Date(
-                          assignment.projectId?.createdAt
-                        ).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-
-                    {assignment.assignedBy && (
-                      <Box sx={{ mb: 2 }}>
-                        <Typography variant="caption" color="text.secondary">
-                          Assigned by: {assignment.assignedBy.email}
+                    <Box sx={{ 
+                      display: "grid", 
+                      gap: 1,
+                      p: 2,
+                      bgcolor: "grey.50",
+                      borderRadius: 1,
+                      border: "1px solid",
+                      borderColor: "grey.200"
+                    }}>
+                      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                          Assigned
+                        </Typography>
+                        <Typography variant="caption" color="text.primary" sx={{ fontWeight: 500 }}>
+                          {new Date(assignment.assignedDate).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric"
+                          })}
                         </Typography>
                       </Box>
-                    )}
+                      
+                      {assignment.assignedBy && (
+                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                            Assigned by
+                          </Typography>
+                          <Typography 
+                            variant="caption" 
+                            color="text.primary" 
+                            noWrap
+                            sx={{ 
+                              fontWeight: 500,
+                              textAlign: "right",
+                              maxWidth: "180px"
+                            }}
+                          >
+                            {assignment.assignedBy.email}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
 
                     {assignment.notes && (
                       <Box
                         sx={{
                           mt: 2,
-                          p: 1.5,
+                          p: 2,
                           bgcolor: "primary.50",
                           borderRadius: 1,
+                          border: "1px solid",
+                          borderColor: "grey.300",
                         }}
                       >
                         <Typography
                           variant="caption"
                           color="primary.main"
-                          sx={{ fontWeight: 500, display: "block", mb: 0.5 }}
+                          sx={{ fontWeight: 600, display: "block", mb: 0.5 }}
                         >
-                          Assignment Notes:
+                          Notes
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
+                        <Typography 
+                          variant="body2" 
+                          color="text.secondary"
+                          sx={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            lineHeight: 1.4,
+                          }}
+                        >
                           {assignment.notes}
                         </Typography>
                       </Box>
                     )}
                   </CardContent>
 
-                  <CardActions sx={{ p: 2, pt: 0 }}>
+                  <CardActions sx={{ p: 3, pt: 0 }}>
                     <Button
-                      size="small"
-                      variant="outlined"
+                      variant="contained"
                       onClick={() => handleViewDetails(assignment)}
                       fullWidth
+                      sx={{
+                        textTransform: "none",
+                        fontWeight: 500,
+                        borderRadius: 1.5,
+                      }}
                     >
                       View Details
                     </Button>

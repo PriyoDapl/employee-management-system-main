@@ -53,7 +53,9 @@ const ProjectAssignmentModal = ({ employee, open, onClose, onSuccess }) => {
       }
 
       const data = await response.json();
-      setProjects(data.projects || []);
+      // Filter to only include active projects for assignment
+      const activeProjects = (data.projects || []).filter(project => project.isActive !== false);
+      setProjects(activeProjects);
     } catch (err) {
       setError(err.message);
     } finally {

@@ -37,7 +37,7 @@ export async function GET(request) {
     const assignments = await ProjectAssignment.find({
       employeeId: decoded.userId,
     })
-      .populate("projectId", "name details createdAt updatedAt")
+      .populate("projectId", "name details createdAt updatedAt isActive")
       .populate("assignedBy", "firstName lastName email")
       .sort({ assignedDate: -1 });
 

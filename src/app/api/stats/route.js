@@ -5,6 +5,7 @@ import { User } from "@/model/User";
 import Project from "@/model/Project";
 import { verifyToken, getTokenFromHeaders } from "@/lib/auth";
 
+// GET - Get statistics for management dashboard or employee view
 export async function GET(request) {
   try {
     await dbConnect();
@@ -23,21 +24,21 @@ export async function GET(request) {
     const stats = {};
 
     if (decoded.role === "management") {
-      // Management can see all stats
-      const [employeeCount, projectCount, totalUsers] = await Promise.all([
-        Employee.countDocuments({ isActive: { $ne: false } }),
-        Project.countDocuments(),
+      // Management can see all stats - count active employees by checking User records with role "employee" and isActive not false
+      const [activeEmployeeCount, activeProjectCount] = await Promise.all([
         User.countDocuments({ role: "employee", isActive: { $ne: false } }),
+        Project.countDocuments({ isActive: { $ne: false } }),
       ]);
 
-      stats.employeeCount = Math.max(employeeCount, totalUsers); // Use the higher count
-      stats.projectCount = projectCount;
-      stats.totalUsers = totalUsers;
+      stats.employeeCount = activeEmployeeCount;
+      stats.projectCount = activeProjectCount; // Only count active projects
     } else {
-      // Employees can see limited stats
-      const [projectCount] = await Promise.all([Project.countDocuments()]);
+      // Employees can see limited stats - only count active projects
+      const [activeProjectCount] = await Promise.all([
+        Project.countDocuments({ isActive: { $ne: false } })
+      ]);
 
-      stats.projectCount = projectCount;
+      stats.projectCount = activeProjectCount; // Only count active projects
       stats.employeeCount = 0; // Employees don't need to see employee count
     }
 

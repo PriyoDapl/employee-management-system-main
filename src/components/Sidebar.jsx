@@ -316,16 +316,21 @@ const Sidebar = ({
                     <Chip
                       label={item.badge}
                       size="small"
-                      onClick={(e) => e.stopPropagation()}
                       sx={{
                         height: 20,
                         fontSize: "0.75rem",
                         bgcolor: isActive
                           ? "rgba(255,255,255,0.2)"
                           : "primary.main",
+                          pointerEvents: "none",
                         color: "white",
                         mr: hasSubmenu ? 1 : 0,
-                        cursor: "default",
+                        cursor: "pointer",
+                        "&:hover": {
+                          bgcolor: isActive
+                            ? "rgba(255,255,255,0.3)"
+                            : "primary.dark",
+                        },
                       }}
                     />
                   )}

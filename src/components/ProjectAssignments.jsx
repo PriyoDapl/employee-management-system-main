@@ -362,13 +362,25 @@ const ProjectAssignments = ({ user, onBack }) => {
                 <Box
                   sx={{
                     p: 3,
-                    bgcolor: "primary.main",
+                    bgcolor: projectGroup.project?.isActive === false ? "#d32f2f" : "primary.main",
                     color: "white",
                   }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-                    {projectGroup.project?.name || "Project Missing"}
-                  </Typography>
+                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}>
+                    <Typography variant="h6" sx={{ fontWeight: 600, flex: 1 }}>
+                      {projectGroup.project?.name || "Project Missing"}
+                    </Typography>
+                    <Chip
+                      label={projectGroup.project?.isActive === false ? "Inactive" : "Active"}
+                      sx={{
+                        bgcolor: "rgba(255,255,255,0.2)",
+                        color: "white",
+                        fontWeight: 500,
+                        ml: 2,
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </Box>
                   <Typography variant="body2" sx={{ opacity: 0.9 }}>
                     {projectGroup.project?.details || "No project details available"}
                   </Typography>

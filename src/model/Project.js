@@ -13,6 +13,10 @@ const projectSchema = new mongoose.Schema({
     trim: true,
     maxlength: [5000, 'Project details cannot exceed 5000 characters'],
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 }, {
   timestamps: true,
 });
@@ -20,6 +24,7 @@ const projectSchema = new mongoose.Schema({
 // Index for better performance
 projectSchema.index({ name: 1 });
 projectSchema.index({ createdAt: -1 });
+projectSchema.index({ isActive: 1 });
 
 // Force delete any existing model to prevent caching issues
 if (mongoose.models.Project) {

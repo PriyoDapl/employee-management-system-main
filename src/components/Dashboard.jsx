@@ -61,16 +61,22 @@ const Dashboard = ({ user, title, onLogout }) => {
   };
   const handleBackToDashboard = () => {
     setCurrentView("dashboard");
+    // Refresh stats when returning to dashboard to ensure data is up-to-date
+    fetchStats();
   };
 
   const handleProjectCountChange = (newCount) => {
     setProjectCount(newCount);
   };
 
+  const handleEmployeeCountChange = (newCount) => {
+    setEmployeeCount(newCount);
+  };
+
   const renderCurrentView = () => {
     switch (currentView) {
       case "employees":
-        return <AllEmployees user={user} onBack={handleBackToDashboard} />;
+        return <AllEmployees user={user} onBack={handleBackToDashboard} onEmployeeCountChange={handleEmployeeCountChange} />;
       case "projects":
         return (
           <ProjectsManagement

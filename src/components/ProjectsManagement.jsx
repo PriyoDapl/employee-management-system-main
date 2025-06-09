@@ -21,8 +21,14 @@ import {
   DialogContent,
   DialogActions,
   Divider,
+  Chip,
+  Switch,
+  FormControlLabel,
+  ToggleButton,
+  ToggleButtonGroup,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBackIos";
+import EditIcon from "@mui/icons-material/Edit";
 
 const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
   const [projects, setProjects] = useState([]);
@@ -30,10 +36,12 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [editingProject, setEditingProject] = useState(null);
-  const [deleteConfirmation, setDeleteConfirmation] = useState({
+  const [statusConfirmation, setStatusConfirmation] = useState({
     isOpen: false,
     project: null,
   });
+  const [showInactive, setShowInactive] = useState(false);
+  const [viewFilter, setViewFilter] = useState("active");
   const [formData, setFormData] = useState({
     name: "",
     details: "",
@@ -41,7 +49,8 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [showInactive]);
+
   const fetchProjects = async () => {
     setLoading(true);
     try {
@@ -52,18 +61,26 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
       }
 
       const token = localStorage.getItem("token");
-      const response = await fetch("/api/projects", {
+      const url = showInactive
+        ? "/api/projects?showInactive=true"
+        : "/api/projects";
+
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       if (response.ok) {
         const data = await response.json();
         const newProjects = data.projects || [];
         setProjects(newProjects);
-        // Notify parent component of the new project count
+        // Notify parent component of the active project count only
         if (onProjectCountChange) {
-          onProjectCountChange(newProjects.length);
+          const activeProjects = newProjects.filter(
+            (p) => p.isActive !== false
+          );
+          onProjectCountChange(activeProjects.length);
         }
       } else {
         const errorData = await response.json();
@@ -89,6 +106,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
     setError("");
     setSuccess("");
     setLoading(true);
+
     if (!formData.name.trim() || !formData.details.trim()) {
       setError("Please fill in all required fields");
       setLoading(false);
@@ -120,6 +138,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
           details: formData.details.trim(),
         }),
       });
+
       if (response.ok) {
         const data = await response.json();
         setSuccess(
@@ -152,14 +171,15 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
     setSuccess("");
   };
 
-  const handleDelete = (project) => {
-    setDeleteConfirmation({
+  const handleToggleStatus = (project) => {
+    setStatusConfirmation({
       isOpen: true,
       project: project,
     });
   };
-  const confirmDelete = async () => {
-    if (deleteConfirmation.project) {
+
+  const confirmToggleStatus = async () => {
+    if (statusConfirmation.project) {
       setLoading(true);
       try {
         // Only access localStorage after component has mounted
@@ -171,9 +191,9 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
 
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `/api/projects/${deleteConfirmation.project._id}`,
+          `/api/projects/${statusConfirmation.project._id}/toggle-status`,
           {
-            method: "DELETE",
+            method: "PATCH",
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -181,24 +201,25 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
         );
 
         if (response.ok) {
-          setSuccess("Project deleted successfully!");
+          const data = await response.json();
+          setSuccess(data.message);
           fetchProjects(); // Refresh projects list
         } else {
           const errorData = await response.json();
-          setError(errorData.error || "Failed to delete project");
+          setError(errorData.error || "Failed to toggle project status");
         }
       } catch (error) {
-        console.error("Error deleting project:", error);
-        setError("Error deleting project");
+        console.error("Error toggling project status:", error);
+        setError("Error toggling project status");
       } finally {
         setLoading(false);
-        setDeleteConfirmation({ isOpen: false, project: null });
+        setStatusConfirmation({ isOpen: false, project: null });
       }
     }
   };
 
-  const cancelDelete = () => {
-    setDeleteConfirmation({ isOpen: false, project: null });
+  const cancelToggleStatus = () => {
+    setStatusConfirmation({ isOpen: false, project: null });
   };
 
   const handleCancelEdit = () => {
@@ -207,6 +228,25 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
     setError("");
     setSuccess("");
   };
+
+  const handleViewFilterChange = (event, newFilter) => {
+    if (newFilter !== null) {
+      setViewFilter(newFilter);
+      setShowInactive(newFilter === "all" || newFilter === "inactive");
+    }
+  };
+
+  const getFilteredProjects = () => {
+    if (viewFilter === "active") {
+      return projects.filter((p) => p.isActive !== false);
+    } else if (viewFilter === "inactive") {
+      return projects.filter((p) => p.isActive === false);
+    }
+    return projects; // 'all'
+  };
+
+  const filteredProjects = getFilteredProjects();
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "grey.100" }}>
       <AppBar
@@ -235,7 +275,8 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
             Projects Management
           </Typography>
         </Toolbar>
-      </AppBar>{" "}
+      </AppBar>
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Create/Edit Project Form */}
         <Paper sx={{ p: 3, mb: 3 }}>
@@ -274,6 +315,11 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
               variant="outlined"
               required
               placeholder="Enter project name"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                },
+              }}
             />
 
             <TextField
@@ -288,6 +334,11 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
               rows={4}
               required
               placeholder="Enter project details and description"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: 2,
+                },
+              }}
             />
 
             <Box sx={{ display: "flex", gap: 2 }}>
@@ -295,7 +346,12 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                 type="submit"
                 variant="contained"
                 disabled={loading}
-                sx={{ minWidth: 140 }}
+                sx={{
+                  minWidth: 140,
+                  borderRadius: 2,
+                  fontWeight: 600,
+                  textTransform: "none",
+                }}
               >
                 {loading ? (
                   <CircularProgress size={24} color="inherit" />
@@ -311,22 +367,69 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                   variant="outlined"
                   onClick={handleCancelEdit}
                   disabled={loading}
+                  sx={{
+                    borderRadius: 2,
+                    textTransform: "none",
+                  }}
                 >
                   Cancel
                 </Button>
-              )}{" "}
+              )}
             </Box>
           </Box>
         </Paper>
+
         {/* Projects List */}
         <Box>
-          <Typography
-            variant="h5"
-            component="h3"
-            sx={{ mb: 3, color: "primary.main" }}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              mb: 3,
+              pl: 2,
+            }}
           >
-            All Projects ({projects.length})
-          </Typography>
+            <Typography
+              variant="h5"
+              component="h3"
+              sx={{ color: "primary.main" }}
+            >
+              Projects ({filteredProjects.length})
+            </Typography>
+
+            <ToggleButtonGroup
+              value={viewFilter}
+              exclusive
+              onChange={handleViewFilterChange}
+              aria-label="project filter"
+              size="small"
+              sx={{
+                "& .MuiToggleButton-root": {
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 500,
+                  padding: "6px 12px",
+                  marginRight: 0.5,
+                  border: "1px solid",
+                  borderColor: "grey.300",
+                },
+                "& .MuiToggleButton-root:last-of-type": {
+                  marginRight: 0,
+                },
+              }}
+            >
+              <ToggleButton value="all" aria-label="all projects">
+                All
+              </ToggleButton>
+              <ToggleButton value="active" aria-label="active projects">
+                Active
+              </ToggleButton>
+              <ToggleButton value="inactive" aria-label="inactive projects">
+                Inactive
+              </ToggleButton>
+            </ToggleButtonGroup>
+          </Box>
 
           {loading && projects.length === 0 ? (
             <Paper sx={{ textAlign: "center", py: 6 }}>
@@ -335,34 +438,71 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                 Loading projects...
               </Typography>
             </Paper>
-          ) : projects.length === 0 ? (
+          ) : filteredProjects.length === 0 ? (
             <Paper sx={{ textAlign: "center", py: 6 }}>
               <Typography color="text.secondary" sx={{ mb: 1 }}>
-                No projects created yet.
+                {viewFilter === "active"
+                  ? "No active projects found."
+                  : viewFilter === "inactive"
+                  ? "No inactive projects found."
+                  : "No projects created yet."}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Create your first project using the form above.
+                {viewFilter === "active" || viewFilter === "all"
+                  ? "Create your first project using the form above."
+                  : "Switch to 'Active' or 'All' to see available projects."}
               </Typography>
             </Paper>
           ) : (
             <Grid container spacing={3}>
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <Grid item xs={12} md={6} lg={4} key={project._id}>
                   <Card
                     sx={{
                       height: "100%",
                       display: "flex",
                       flexDirection: "column",
+                      borderRadius: 3,
+                      border: "1px solid",
+                      borderColor: "grey.200",
+                      bgcolor: "white",
                     }}
                   >
                     <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography
-                        variant="h6"
-                        component="h4"
-                        sx={{ mb: 2, fontWeight: "bold" }}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          mb: 2,
+                        }}
                       >
-                        {project.name}
-                      </Typography>
+                        <Typography
+                          variant="h6"
+                          component="h4"
+                          sx={{
+                            fontWeight: "bold",
+                            color:
+                              project.isActive === false
+                                ? "text.secondary"
+                                : "text.primary",
+                            flex: 1,
+                          }}
+                        >
+                          {project.name}
+                        </Typography>
+                        <Chip
+                          label={
+                            project.isActive === false ? "Inactive" : "Active"
+                          }
+                          color={
+                            project.isActive === false ? "default" : "success"
+                          }
+                          size="small"
+                          sx={{ ml: 1, fontWeight: 500, pointerEvents: "none" }}
+                        />
+                      </Box>
+
                       <Typography
                         variant="body2"
                         color="text.secondary"
@@ -370,6 +510,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                       >
                         {project.details}
                       </Typography>
+
                       <Box sx={{ mb: 2 }}>
                         <Typography
                           variant="caption"
@@ -391,26 +532,41 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                         )}
                       </Box>
                     </CardContent>
+
                     <Divider />
+
                     <Box sx={{ p: 2, display: "flex", gap: 1 }}>
                       <Button
                         fullWidth
                         variant="outlined"
+                        startIcon={<EditIcon />}
                         onClick={() => handleEdit(project)}
                         disabled={loading}
                         size="small"
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 500,
+                        }}
                       >
                         Edit
                       </Button>
                       <Button
                         fullWidth
                         variant="outlined"
-                        color="error"
-                        onClick={() => handleDelete(project)}
+                        color={
+                          project.isActive === false ? "success" : "warning"
+                        }
+                        onClick={() => handleToggleStatus(project)}
                         disabled={loading}
                         size="small"
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 500,
+                        }}
                       >
-                        Delete
+                        {project.isActive === false ? "Activate" : "Deactivate"}
                       </Button>
                     </Box>
                   </Card>
@@ -419,32 +575,63 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
             </Grid>
           )}
         </Box>
-        {/* Delete Confirmation Dialog */}
+
+        {/* Status Toggle Confirmation Dialog */}
         <Dialog
-          open={deleteConfirmation.isOpen}
-          onClose={cancelDelete}
-          aria-labelledby="delete-dialog-title"
-          aria-describedby="delete-dialog-description"
+          open={statusConfirmation.isOpen}
+          onClose={cancelToggleStatus}
+          maxWidth="sm"
+          fullWidth
+          sx={{
+            "& .MuiDialog-paper": {
+              borderRadius: 3,
+            },
+          }}
         >
-          <DialogTitle id="delete-dialog-title">Delete Project</DialogTitle>
+          <DialogTitle sx={{ fontWeight: 600 }}>
+            {statusConfirmation.project?.isActive === false
+              ? "Activate"
+              : "Deactivate"}{" "}
+            Project
+          </DialogTitle>
           <DialogContent>
-            <Typography id="delete-dialog-description">
-              Are you sure you want to delete the project "
-              {deleteConfirmation.project?.name}"? It won't be saved anywhere
-              else and hence, cannot be recovered.
+            <Typography>
+              Are you sure you want to{" "}
+              <strong>
+                {statusConfirmation.project?.isActive === false
+                  ? "activate"
+                  : "deactivate"}
+              </strong>{" "}
+              the project "<strong>{statusConfirmation.project?.name}</strong>"?
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+              {statusConfirmation.project?.isActive === false
+                ? "This project will become visible and available for assignment to employees."
+                : "This project will be hidden from new assignments but existing assignments will remain."}
             </Typography>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={cancelDelete} variant="outlined">
+          <DialogActions sx={{ p: 2.5 }}>
+            <Button
+              onClick={cancelToggleStatus}
+              variant="outlined"
+              sx={{ borderRadius: 2, textTransform: "none" }}
+            >
               Cancel
             </Button>
             <Button
-              onClick={confirmDelete}
+              onClick={confirmToggleStatus}
               variant="contained"
-              color="error"
+              color={
+                statusConfirmation.project?.isActive === false
+                  ? "success"
+                  : "warning"
+              }
               autoFocus
+              sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
             >
-              Delete
+              {statusConfirmation.project?.isActive === false
+                ? "Activate"
+                : "Deactivate"}
             </Button>
           </DialogActions>
         </Dialog>

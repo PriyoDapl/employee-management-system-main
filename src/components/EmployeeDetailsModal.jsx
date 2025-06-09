@@ -19,7 +19,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import ManagementEmployeeEdit from "./ManagementEmployeeEdit";
 
-const EmployeeDetailsModal = ({ employee, user, onClose }) => {
+const EmployeeDetailsModal = ({ employee, user, onClose, onEmployeeUpdate }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(employee);
   const employeeData = currentEmployee.employeeData || currentEmployee;
@@ -37,8 +37,10 @@ const EmployeeDetailsModal = ({ employee, user, onClose }) => {
     setCurrentEmployee(updatedEmployee);
     setShowEditModal(false);
 
-    // Optionally trigger a refresh in the parent component
-    // if there's a callback for that
+    // Trigger refresh in the parent component
+    if (onEmployeeUpdate) {
+      onEmployeeUpdate();
+    }
   };
   if (showEditModal) {
     return (
@@ -347,9 +349,7 @@ const EmployeeDetailsModal = ({ employee, user, onClose }) => {
                           variant="body1"
                           sx={{
                             fontWeight: 500,
-                            color: employeeData.salary
-                              ? "success.main"
-                              : "text.secondary",
+                            color: "text.primary",
                           }}
                         >
                           {employeeData.salary

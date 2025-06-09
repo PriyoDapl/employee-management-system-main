@@ -26,11 +26,13 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBackIos";
 import EmployeeDetailsModal from "./EmployeeDetailsModal";
 import ProjectAssignmentModal from "./ProjectAssignmentModal";
 
-const AllEmployees = ({ user, onBack }) => {
+const AllEmployees = ({ user, onBack, onEmployeeCountChange }) => {
   const [employees, setEmployees] = useState([]);
   const [filteredEmployees, setFilteredEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [assigningEmployee, setAssigningEmployee] = useState(null);
   const [departmentFilter, setDepartmentFilter] = useState([]);
@@ -159,16 +161,39 @@ const AllEmployees = ({ user, onBack }) => {
       const employeeData = userData.filter((user) => user.role === "employee");
       setEmployees(employeeData);
       setFilteredEmployees(employeeData); // Initialize filtered employees
+      setError(""); // Clear any previous errors
+      
+      // Notify parent component about the updated active employee count
+      if (onEmployeeCountChange) {
+        const activeEmployeeCount = employeeData.filter(emp => emp.isActive !== false).length;
+        onEmployeeCountChange(activeEmployeeCount);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (!refreshing) {
+        setLoading(false);
+      }
     }
   };
   const handleEmployeeClick = (employee) => {
     setSelectedEmployee(employee);
   };
   const handleCloseModal = () => {
+    setSelectedEmployee(null);
+  };
+
+  const handleEmployeeUpdate = () => {
+    // Refresh employee data after an update
+    setRefreshing(true);
+    setSuccessMessage("Employee updated successfully!");
+    fetchEmployees().finally(() => {
+      setRefreshing(false);
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+    });
     setSelectedEmployee(null);
   };
 
@@ -247,6 +272,14 @@ const AllEmployees = ({ user, onBack }) => {
           >
             All Employees
           </Typography>
+          {refreshing && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mr: 2 }}>
+              <CircularProgress size={20} color="primary" />
+              <Typography variant="body2" color="text.secondary">
+                Refreshing...
+              </Typography>
+            </Box>
+          )}
         </Toolbar>{" "}
       </AppBar>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -659,6 +692,7 @@ const AllEmployees = ({ user, onBack }) => {
             employee={selectedEmployee}
             user={user}
             onClose={handleCloseModal}
+            onEmployeeUpdate={handleEmployeeUpdate}
           />
         )}
         {assigningEmployee && (

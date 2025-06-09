@@ -18,7 +18,6 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        // In a real app, you'd validate the token with your backend
         const userData = JSON.parse(localStorage.getItem("userData"));
         setUser(userData);
       } catch (error) {

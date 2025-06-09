@@ -20,8 +20,18 @@ export async function GET(request) {
     
     await dbConnect();
 
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const showInactive = searchParams.get('showInactive') === 'true';
+    
+    // Build filter based on query parameters
+    let filter = {};
+    if (!showInactive) {
+      filter.isActive = true;
+    }
+
     // Fetch projects
-    const projects = await Project.find({})
+    const projects = await Project.find(filter)
       .sort({ createdAt: -1 });
 
     return NextResponse.json({

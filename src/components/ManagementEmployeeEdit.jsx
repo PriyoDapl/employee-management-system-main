@@ -683,7 +683,7 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
                             color={formData.isActive ? "success" : "error"}
                             variant="filled"
                             size="medium"
-                            sx={{ fontWeight: 600 }}
+                            sx={{ fontWeight: 600 , pointerEvents: "none" }}
                           />
                         </Box>
                       }

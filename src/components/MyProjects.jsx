@@ -17,6 +17,7 @@ import {
   AppBar,
   Toolbar,
   IconButton,
+  Chip,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBackIos";
 import ProjectDetailsModal from "./ProjectDetailsModal";
@@ -159,21 +160,46 @@ const MyProjects = ({ user, onBack }) => {
                       transform: "translateY(-2px)",
                       boxShadow: 4,
                     },
+                    bgcolor: "white",
+                    border: "1px solid",
+                    borderColor: "grey.200",
                   }}
                 >
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography
-                      variant="h6"
-                      component="h3"
-                      gutterBottom
+                    <Box
                       sx={{
-                        fontWeight: 600,
-                        color: "primary.main",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
                         mb: 2,
                       }}
                     >
-                      {assignment.projectId?.name || "Unnamed Project"}
-                    </Typography>
+                      <Typography
+                        variant="h6"
+                        component="h3"
+                        gutterBottom
+                        sx={{
+                          fontWeight: 600,
+                          color: assignment.projectId?.isActive === false 
+                            ? "text.secondary" 
+                            : "primary.main",
+                          mb: 0,
+                          flex: 1,
+                        }}
+                      >
+                        {assignment.projectId?.name || "Unnamed Project"}
+                      </Typography>
+                      <Chip
+                        label={
+                          assignment.projectId?.isActive === false ? "Inactive" : "Active"
+                        }
+                        color={
+                          assignment.projectId?.isActive === false ? "default" : "success"
+                        }
+                        size="small"
+                        sx={{ ml: 1, fontWeight: 500 }}
+                      />
+                    </Box>
 
                     <Typography
                       variant="body2"
