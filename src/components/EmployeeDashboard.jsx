@@ -16,6 +16,7 @@ import {
 import Layout from "./Layout";
 import EmployeeDetails from "./EmployeeDetails";
 import AssignedProjects from "./AssignedProjects";
+import AssignedTasks from "./AssignedTasks";
 
 const EmployeeDashboard = ({ user, onLogout }) => {
   const [mounted, setMounted] = useState(false);
@@ -25,6 +26,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
   const [employeeCount, setEmployeeCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
   const [myProjectCount, setMyProjectCount] = useState(0);
+  const [myTaskCount, setMyTaskCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -34,6 +36,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
       checkExistingProfile();
       fetchStats();
       fetchMyProjectCount();
+      fetchMyTaskCount();
     }
   }, [mounted]);
   const fetchStats = async () => {
@@ -80,6 +83,29 @@ const EmployeeDashboard = ({ user, onLogout }) => {
       }
     } catch (error) {
       console.error("Error fetching my project count:", error);
+    }
+  };
+
+  const fetchMyTaskCount = async () => {
+    try {
+      if (typeof window === "undefined") return;
+
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("/api/employee/tasks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setMyTaskCount(data.tasks?.length || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching my task count:", error);
     }
   };
 
@@ -138,6 +164,14 @@ const EmployeeDashboard = ({ user, onLogout }) => {
             onProjectCountChange={setMyProjectCount}
           />
         );
+        case "tasks":
+        return (
+          <AssignedTasks
+            user={user}
+            onBack={handleBackToDashboard}
+            onTaskCountChange={setMyTaskCount}
+          />
+        );
       case "schedule":
         return <SchedulePlaceholder />;
       case "timesheet":
@@ -188,6 +222,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
       onAddDetails={handleAddDetails}
       employeeCount={employeeCount}
       projectCount={myProjectCount}
+      taskCount={myTaskCount}
       hasProfile={hasProfile}
     >
       {renderCurrentView()}

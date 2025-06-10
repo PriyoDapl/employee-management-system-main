@@ -26,6 +26,42 @@ const theme = createTheme({
       '"Segoe UI Symbol"',
     ].join(","),
   },
+  components: {
+    // Fix modal scrollbar behavior
+    MuiModal: {
+      defaultProps: {
+        // Prevent body scroll lock that causes scrollbar to disappear
+        disableScrollLock: true,
+      },
+      styleOverrides: {
+        root: {
+          // Ensure backdrop doesn't interfere with scrollbar
+          '&.MuiModal-root': {
+            zIndex: 1300,
+          },
+        },
+      },
+    },
+    MuiDialog: {
+      defaultProps: {
+        // Prevent body scroll lock that causes scrollbar to disappear
+        disableScrollLock: true,
+      },
+      styleOverrides: {
+        root: {
+          // Ensure dialog doesn't interfere with scrollbar
+          '& .MuiDialog-container': {
+            outline: 'none',
+          },
+        },
+      },
+    },
+    MuiDrawer: {
+      defaultProps: {
+        // Used to prevent scrollbar issues with drawer now it has a fixed width
+      },
+    },
+  },
 });
 
 export default theme;

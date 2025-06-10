@@ -15,12 +15,14 @@ import ManagementDetails from "./ManagementDetails";
 import AllEmployees from "./AllEmployees";
 import ProjectsManagement from "./ProjectsManagement";
 import ProjectAssignments from "./ProjectAssignments";
+import TaskManagement from "./TaskManagement";
 
 const Dashboard = ({ user, title, onLogout }) => {
   const [mounted, setMounted] = useState(false);
   const [currentView, setCurrentView] = useState("dashboard");
   const [employeeCount, setEmployeeCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
+  const [taskCount, setTaskCount] = useState(0);
 
   useEffect(() => {
     setMounted(true);
@@ -29,6 +31,7 @@ const Dashboard = ({ user, title, onLogout }) => {
   useEffect(() => {
     if (mounted) {
       fetchStats();
+      fetchTaskCount();
     }
   }, [mounted]);
 
@@ -56,6 +59,29 @@ const Dashboard = ({ user, title, onLogout }) => {
     }
   };
 
+  const fetchTaskCount = async () => {
+    try {
+      if (typeof window === "undefined") return;
+
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("/api/management/tasks", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setTaskCount(data.tasks?.length || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching task count:", error);
+    }
+  };
+
   const handleViewChange = (view) => {
     setCurrentView(view);
   };
@@ -63,6 +89,7 @@ const Dashboard = ({ user, title, onLogout }) => {
     setCurrentView("dashboard");
     // Refresh stats when returning to dashboard to ensure data is up-to-date
     fetchStats();
+    fetchTaskCount();
   };
 
   const handleProjectCountChange = (newCount) => {
@@ -71,6 +98,10 @@ const Dashboard = ({ user, title, onLogout }) => {
 
   const handleEmployeeCountChange = (newCount) => {
     setEmployeeCount(newCount);
+  };
+
+  const handleTaskCountChange = (newCount) => {
+    setTaskCount(newCount);
   };
 
   const renderCurrentView = () => {
@@ -88,6 +119,14 @@ const Dashboard = ({ user, title, onLogout }) => {
       case "assignments":
         return (
           <ProjectAssignments user={user} onBack={handleBackToDashboard} />
+        );
+      case "tasks":
+        return (
+          <TaskManagement 
+            user={user} 
+            onBack={handleBackToDashboard}
+            onTaskCountChange={handleTaskCountChange}
+          />
         );
       case "hr":
         return <DepartmentPlaceholder department="Human Resources" />;
@@ -143,6 +182,7 @@ const Dashboard = ({ user, title, onLogout }) => {
       onViewChange={handleViewChange}
       employeeCount={employeeCount}
       projectCount={projectCount}
+      taskCount={taskCount}
     >
       {renderCurrentView()}
     </Layout>

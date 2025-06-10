@@ -23,6 +23,7 @@ import {
   AccountCircle as AccountCircleIcon,
   Menu as MenuIcon,
 } from "@mui/icons-material";
+// import NotificationMenu from "./NotificationMenu";
 
 const Header = ({
   user,
@@ -56,6 +57,14 @@ const Header = ({
 
   const isEmployee = user?.role === "employee";
   const isManagement = user?.role === "management";
+  const handleViewProfile = () => {
+    handleProfileMenuClose();
+    // Navigate to profile or trigger profile view
+    if (onAddDetails) {
+      onAddDetails(); // Reuse the existing function to show profile
+    }
+  };
+
   return (
     <AppBar
       position="sticky"
@@ -123,6 +132,9 @@ const Header = ({
 
         {/* User Profile Section */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* Notifications */}
+          {/* <NotificationMenu user={user} /> */}
+
           <Box
             sx={{ textAlign: "right", display: { xs: "none", sm: "block" } }}
           >
@@ -183,12 +195,14 @@ const Header = ({
               </Typography>
             </Box>
             <Divider />
-            <MenuItem onClick={handleProfileMenuClose}>
-              <ListItemIcon>
-                <AccountCircleIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>View Profile</ListItemText>
-            </MenuItem>{" "}
+            {isEmployee && (
+              <MenuItem onClick={handleViewProfile}>
+                <ListItemIcon>
+                  <AccountCircleIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>View Profile</ListItemText>
+              </MenuItem>
+            )}
             {isEmployee && onAddDetails && !hasProfile && (
               <MenuItem onClick={handleAddDetails}>
                 <ListItemIcon>

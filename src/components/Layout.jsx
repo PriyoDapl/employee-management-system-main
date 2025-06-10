@@ -14,6 +14,7 @@ const Layout = ({
   onAddDetails,
   employeeCount,
   projectCount,
+  taskCount,
   hasProfile = false,
 }) => {
   const [mounted, setMounted] = useState(false);
@@ -88,6 +89,7 @@ const Layout = ({
         onToggleSidebar={handleToggleSidebar}
         employeeCount={employeeCount}
         projectCount={projectCount}
+        taskCount={taskCount}
       />
 
       <Box

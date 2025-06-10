@@ -3,3 +3,4 @@ export { User } from "./User.js";
 export { Employee } from "./Employee.js";
 export { Project } from "./Project.js";
 export { ProjectAssignment } from "./ProjectAssignment.js";
+export { Task } from "./Task.js";

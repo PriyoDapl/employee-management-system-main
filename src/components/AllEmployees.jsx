@@ -569,7 +569,6 @@ const AllEmployees = ({ user, onBack, onEmployeeCountChange }) => {
                     sx={{
                       "&:hover": {
                         bgcolor: "primary.50",
-                        cursor: "pointer",
                       },
                       bgcolor: index % 2 === 0 ? "grey.50" : "white",
                     }}

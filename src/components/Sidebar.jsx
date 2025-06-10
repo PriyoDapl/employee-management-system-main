@@ -33,6 +33,7 @@ import {
   Schedule as ScheduleIcon,
   Notifications as NotificationsIcon,
   AssignmentInd as AssignmentsIcon,
+  Task as TaskIcon,
 } from "@mui/icons-material";
 
 const Sidebar = ({
@@ -45,6 +46,7 @@ const Sidebar = ({
   onToggleSidebar,
   employeeCount,
   projectCount,
+  taskCount,
 }) => {
   const [mounted, setMounted] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState("");
@@ -134,6 +136,13 @@ const Sidebar = ({
       badge: projectCount?.toString() || "0",
     },
     {
+      id: "tasks",
+      text: "My Tasks",
+      icon: <AssignmentsIcon />,
+      view: "tasks",
+      badge: taskCount?.toString() || "0",
+    },
+    {
       id: "schedule",
       text: "Schedule",
       icon: <ScheduleIcon />,
@@ -179,6 +188,13 @@ const Sidebar = ({
       view: "assignments",
     },
     {
+      id: "tasks",
+      text: "Task Management",
+      icon: <TaskIcon />,
+      view: "tasks",
+      badge: taskCount?.toString() || "0",
+    },
+    {
       id: "departments",
       text: "Departments",
       icon: <CompanyIcon />,
@@ -204,13 +220,6 @@ const Sidebar = ({
       text: "Reports",
       icon: <ReportsIcon />,
       view: "reports",
-    },
-    {
-      id: "notifications",
-      text: "Notifications",
-      icon: <NotificationsIcon />,
-      view: "notifications",
-      badge: "0", // Placeholder for notifications count
     },
     {
       id: "settings",
@@ -426,6 +435,7 @@ const Sidebar = ({
         }}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
+          disableScrollLock: true, // Prevent body scroll lock
         }}
       >
         {/* System Title */}
