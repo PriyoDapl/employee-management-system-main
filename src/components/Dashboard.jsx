@@ -16,6 +16,9 @@ import AllEmployees from "./AllEmployees";
 import ProjectsManagement from "./ProjectsManagement";
 import ProjectAssignments from "./ProjectAssignments";
 import TaskManagement from "./TaskManagement";
+import Settings from "./Settings";
+import MailManagement from "./MailManagement";
+import InboxManagement from "./InboxManagement";
 
 const Dashboard = ({ user, title, onLogout }) => {
   const [mounted, setMounted] = useState(false);
@@ -128,6 +131,20 @@ const Dashboard = ({ user, title, onLogout }) => {
             onTaskCountChange={handleTaskCountChange}
           />
         );
+      case "mailmanagement":
+        return (
+          <MailManagement
+            user={user}
+            onBack={handleBackToDashboard}
+          />
+        );
+      case "inbox":
+        return (
+          <InboxManagement
+            user={user}
+            onBack={handleBackToDashboard}
+          />
+        );
       case "hr":
         return <DepartmentPlaceholder department="Human Resources" />;
       case "it":
@@ -147,7 +164,7 @@ const Dashboard = ({ user, title, onLogout }) => {
       case "notifications":
         return <NotificationsPlaceholder />;
       case "settings":
-        return <SettingsPlaceholder />;
+        return <Settings user={user} onBack={handleBackToDashboard} />;
       default:
         return <DashboardContent user={user} />;
     }

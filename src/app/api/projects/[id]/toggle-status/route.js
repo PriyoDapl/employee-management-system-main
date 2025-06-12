@@ -43,7 +43,7 @@ export async function PATCH(request, { params }) {
 
     return NextResponse.json({
       success: true,
-      message: `Project ${updatedProject.isActive ? 'activated' : 'deactivated'} successfully`,
+      message: `Project ${updatedProject.isActive ? 'opened' : 'closed'} successfully`,
       project: updatedProject
     });
 

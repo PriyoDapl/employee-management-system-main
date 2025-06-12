@@ -5,7 +5,7 @@
 /**
  * Formats a due date relative to today
  * @param {string|Date} dueDate - The due date to format
- * @returns {string} - Formatted string like "Due today", "Due tomorrow", etc.
+ * @returns {string} - Formatted string like "Due today", "Due tomorrow", etc.,.
  */
 export const formatDueDate = (dueDate) => {
   if (!dueDate) return "No due date";
@@ -13,13 +13,14 @@ export const formatDueDate = (dueDate) => {
   const dueDateTime = new Date(dueDate);
   const now = new Date();
   
-  // Compare only the date parts, not time
+  // Compare only the date parts, and leaving the time part out for the time zone issues
   const dueDateOnly = new Date(dueDateTime.getFullYear(), dueDateTime.getMonth(), dueDateTime.getDate());
   const todayOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   
   const diffTime = dueDateOnly - todayOnly;
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)); // Converting milliseconds to days
   
+  // The negative value will indicate overdue tasks and also the number of days overdue
   if (diffDays < 0) {
     return `Overdue by ${Math.abs(diffDays)} day(s)`;
   } else if (diffDays === 0) {

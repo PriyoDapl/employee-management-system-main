@@ -15,6 +15,9 @@ const AuthProvider = ({ children }) => {
       return;
     }
 
+    // Get token from localStorage
+    // If token exists, fetch user data from localStorage
+    // If token is invalid or user data is not found, clear localStorage
     const token = localStorage.getItem("token");
     if (token) {
       try {
@@ -28,12 +31,15 @@ const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // This function should be called after successful authentication
+  // It saves the token and user data to localStorage and updates the user state
   const login = (token, userData) => {
     localStorage.setItem("token", token);
     localStorage.setItem("userData", JSON.stringify(userData));
     setUser(userData);
   };
 
+  // This function clears the token and user data from localStorage and updates the user state when logging out
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userData");
@@ -47,9 +53,10 @@ const AuthProvider = ({ children }) => {
     loading,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>; // Providing auth context to children
 };
 
+// Just a custom hook to use the AuthContext
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

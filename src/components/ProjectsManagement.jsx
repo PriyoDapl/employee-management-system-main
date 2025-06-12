@@ -566,7 +566,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                           fontWeight: 500,
                         }}
                       >
-                        {project.isActive === false ? "Activate" : "Deactivate"}
+                        {project.isActive === false ? "Open" : "Close"}
                       </Button>
                     </Box>
                   </Card>
@@ -590,8 +590,8 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
         >
           <DialogTitle sx={{ fontWeight: 600 }}>
             {statusConfirmation.project?.isActive === false
-              ? "Activate"
-              : "Deactivate"}{" "}
+              ? "Open"
+              : "Close"}{" "}
             Project
           </DialogTitle>
           <DialogContent>
@@ -599,8 +599,8 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
               Are you sure you want to{" "}
               <strong>
                 {statusConfirmation.project?.isActive === false
-                  ? "activate"
-                  : "deactivate"}
+                  ? "open"
+                  : "close"}
               </strong>{" "}
               the project "<strong>{statusConfirmation.project?.name}</strong>"?
             </Typography>
@@ -630,8 +630,8 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
               sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600 }}
             >
               {statusConfirmation.project?.isActive === false
-                ? "Activate"
-                : "Deactivate"}
+                ? "Open"
+                : "Close"}
             </Button>
           </DialogActions>
         </Dialog>

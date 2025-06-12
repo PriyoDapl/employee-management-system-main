@@ -34,6 +34,9 @@ import {
   Notifications as NotificationsIcon,
   AssignmentInd as AssignmentsIcon,
   Task as TaskIcon,
+  Mail as MailIcon,
+  AlternateEmail as MailAltIcon,
+  Send
 } from "@mui/icons-material";
 
 const Sidebar = ({
@@ -64,14 +67,13 @@ const Sidebar = ({
     setMounted(true);
   }, []);
 
-  // Dynamic width: collapsed = 64px (icons only), expanded = 280px
   // On desktop, sidebar is always visible
   // On mobile, sidebar can be hidden
-  const drawerWidth = isCollapsed ? 64 : 280;
-  const shouldShowSidebar = isMobile ? isOpen : true; // Always show on desktop
+  const drawerWidth = isCollapsed ? 64 : 240;
+  const shouldShowSidebar = isMobile ? isOpen : true;
 
   const handleSubmenuToggle = (menuName) => {
-    if (isCollapsed) return; // Don't allow submenu toggle when collapsed
+    if (isCollapsed) return; 
     setOpenSubmenu(openSubmenu === menuName ? "" : menuName);
   };
 
@@ -143,6 +145,18 @@ const Sidebar = ({
       badge: taskCount?.toString() || "0",
     },
     {
+      id: "mailmanagement",
+      text: "Send Mail",
+      icon: <Send />,
+      view: "mailmanagement",
+    },
+    {
+      id: "inbox",
+      text: "Inbox",
+      icon: <MailIcon />,
+      view: "inbox",
+    },
+    {
       id: "schedule",
       text: "Schedule",
       icon: <ScheduleIcon />,
@@ -193,6 +207,18 @@ const Sidebar = ({
       icon: <TaskIcon />,
       view: "tasks",
       badge: taskCount?.toString() || "0",
+    },
+    {
+      id: "mailmanagement",
+      text: "Send Mail",
+      icon: <Send />,
+      view: "mailmanagement",
+    },
+    {
+      id: "inbox",
+      text: "Inbox",
+      icon: <MailIcon />,
+      view: "inbox",
     },
     {
       id: "departments",
@@ -316,8 +342,8 @@ const Sidebar = ({
                     primary={item.text}
                     sx={{
                       "& .MuiListItemText-primary": {
-                        fontWeight: isActive ? 600 : 500,
-                        fontSize: "0.95rem",
+                        fontWeight: isActive ? 600 : 400,
+                        fontSize: "0.85rem",
                       },
                     }}
                   />
@@ -467,8 +493,8 @@ const Sidebar = ({
             variant={isCollapsed ? "caption" : "h6"}
             sx={{
               fontWeight: 600,
-              fontSize: isCollapsed ? "1.25rem" : "1rem",
-              lineHeight: isCollapsed ? "2.35" : "2",
+              fontSize: isCollapsed ? "1.25rem" : ".9rem",
+              lineHeight: isCollapsed ? "2.35" : "2.2",
               whiteSpace: isCollapsed ? "nowrap" : "nowrap",
               position: "relative",
               zIndex: 1,
@@ -479,7 +505,7 @@ const Sidebar = ({
         </Box>
 
         {/* Navigation */}
-        <Box sx={{ flexGrow: 1, overflow: "auto", py: 1 }}>
+        <Box sx={{ flexGrow: 1, overflow: "auto", py: 0 }}>
           <List sx={{ px: 0 }}>{navigationItems.map(renderNavItem)}</List>
         </Box>
 

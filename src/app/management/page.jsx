@@ -37,6 +37,7 @@ export default function ManagementDashboard() {
     return <LoadingScreen />;
   }
 
+  // If user is not management, show access denied message and signin redirect for development
   if (user.role !== "management") {
     return (
       <Box

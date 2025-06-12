@@ -1,7 +1,9 @@
+// This file will later be used to change the theme of the application. The dark mode theme will be used in the future.
 "use client";
 
 import { createTheme } from "@mui/material/styles";
 
+// A Material-UI theme with light mode and a custom scrollbar
 const theme = createTheme({
   palette: {
     mode: "light",

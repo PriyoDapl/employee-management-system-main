@@ -180,11 +180,11 @@ const CreateTaskModal = ({ open, onClose, onSuccess, projects, employees }) => {
           {/* Project */}
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth sx={{ width: "10vw" }} disabled={loading}>
-              <InputLabel>Project (Optional)</InputLabel>
+              <InputLabel>Project</InputLabel>
               <Select
                 value={formData.projectId}
                 onChange={(e) => handleChange("projectId", e.target.value)}
-                label="Project (Optional)"
+                label="Project"
               >
                 <MenuItem value="">
                   <em>No Project</em>

@@ -17,6 +17,8 @@ import Layout from "./Layout";
 import EmployeeDetails from "./EmployeeDetails";
 import AssignedProjects from "./AssignedProjects";
 import AssignedTasks from "./AssignedTasks";
+import MailManagement from "./MailManagement";
+import InboxManagement from "./InboxManagement";
 
 const EmployeeDashboard = ({ user, onLogout }) => {
   const [mounted, setMounted] = useState(false);
@@ -170,6 +172,20 @@ const EmployeeDashboard = ({ user, onLogout }) => {
             user={user}
             onBack={handleBackToDashboard}
             onTaskCountChange={setMyTaskCount}
+          />
+        );
+      case "mailmanagement":
+        return (
+          <MailManagement
+            user={user}
+            onBack={handleBackToDashboard}
+          />
+        );
+      case "inbox":
+        return (
+          <InboxManagement
+            user={user}
+            onBack={handleBackToDashboard}
           />
         );
       case "schedule":

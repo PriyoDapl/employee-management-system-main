@@ -119,7 +119,6 @@ const taskSchema = new mongoose.Schema(
   }
 );
 
-// Indexes for better performance
 taskSchema.index({ assignedTo: 1, status: 1 });
 taskSchema.index({ projectId: 1, status: 1 });
 taskSchema.index({ createdBy: 1, createdAt: -1 });
@@ -139,7 +138,7 @@ taskSchema.pre('save', function(next) {
   next();
 });
 
-// Middleware to handle completed date
+// Another Middleware to handle completed date
 taskSchema.pre('save', function(next) {
   if (this.isModified('status')) {
     if (this.status === 'Completed' && !this.completedDate) {
@@ -156,7 +155,7 @@ taskSchema.virtual('isOverdue').get(function() {
   return this.dueDate < new Date() && this.status !== 'Completed';
 });
 
-// Virtual for progress percentage based on status
+// Virtual for progress percentage based on status (not in use but for later reference)
 taskSchema.virtual('progressPercentage').get(function() {
   const statusProgress = {
     'Assigned': 0,

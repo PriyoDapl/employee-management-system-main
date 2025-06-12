@@ -32,12 +32,11 @@ const projectAssignmentSchema = new mongoose.Schema(
   }
 );
 
-// Index for better performance
 projectAssignmentSchema.index({ employeeId: 1 });
 projectAssignmentSchema.index({ projectId: 1 });
 projectAssignmentSchema.index({ assignedDate: -1 });
 
-// Ensure unique assignment per project-employee combination
+// Here is the unique assignment per project-employee combination
 projectAssignmentSchema.index(
   { projectId: 1, employeeId: 1 },
   { unique: true }

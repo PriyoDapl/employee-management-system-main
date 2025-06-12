@@ -26,7 +26,7 @@ projectSchema.index({ name: 1 });
 projectSchema.index({ createdAt: -1 });
 projectSchema.index({ isActive: 1 });
 
-// Force delete any existing model to prevent caching issues
+// To prevent the "OverwriteModelError" when the model is already defined.
 if (mongoose.models.Project) {
   delete mongoose.models.Project;
 }
