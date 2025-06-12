@@ -24,6 +24,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
   const [mounted, setMounted] = useState(false);
   const [currentView, setCurrentView] = useState("dashboard");
   const [hasProfile, setHasProfile] = useState(false);
+  const [profileCompleted, setProfileCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [employeeCount, setEmployeeCount] = useState(0);
   const [projectCount, setProjectCount] = useState(0);
@@ -126,7 +127,12 @@ const EmployeeDashboard = ({ user, onLogout }) => {
       });
 
       if (response.ok) {
+        const profileData = await response.json();
         setHasProfile(true);
+        setProfileCompleted(profileData.profileCompleted || false);
+      } else {
+        setHasProfile(false);
+        setProfileCompleted(false);
       }
     } catch (error) {
       console.error("Error checking profile:", error);
@@ -199,6 +205,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
           <DashboardContent
             user={user}
             hasProfile={hasProfile}
+            profileCompleted={profileCompleted}
             loading={loading}
           />
         );
@@ -223,6 +230,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
           <DashboardContent
             user={user}
             hasProfile={hasProfile}
+            profileCompleted={profileCompleted}
             loading={loading}
           />
         </Box>
@@ -247,7 +255,7 @@ const EmployeeDashboard = ({ user, onLogout }) => {
 };
 
 // Dashboard main content
-const DashboardContent = ({ user, hasProfile, loading }) => {
+const DashboardContent = ({ user, hasProfile, profileCompleted, loading }) => {
   if (loading) {
     return (
       <Box
@@ -276,12 +284,6 @@ const DashboardContent = ({ user, hasProfile, loading }) => {
           {user?.role || "employee"} dashboard
         </Typography>
       </Box>
-
-      {!hasProfile && (
-        <Alert severity="info" sx={{ mb: 3, maxWidth: 600, mx: "auto" }}>
-          Complete your profile to access all features and projects.
-        </Alert>
-      )}
     </Container>
   );
 };

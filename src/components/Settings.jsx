@@ -105,18 +105,21 @@ const Settings = ({ user, onBack }) => {
       setLoading(true); // Always show loading when fetching
       console.log("Fetching position mappings...");
       const token = localStorage.getItem("token");
-      
+
       // Add timestamp to prevent caching
       const timestamp = new Date().getTime();
-      const response = await fetch(`/api/management/position-emails?t=${timestamp}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0"
-        },
-      });
+      const response = await fetch(
+        `/api/management/position-emails?t=${timestamp}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch position email mappings");
@@ -135,7 +138,7 @@ const Settings = ({ user, onBack }) => {
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -174,7 +177,7 @@ const Settings = ({ user, onBack }) => {
         setSuccess("Position email mapping created successfully");
         setShowAddModal(false);
         resetForm();
-        setRefreshTrigger(prev => prev + 1); // Trigger refresh
+        setRefreshTrigger((prev) => prev + 1); // Trigger refresh
         setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(data.error || "Failed to create position email mapping");
@@ -214,7 +217,7 @@ const Settings = ({ user, onBack }) => {
         setShowEditModal(false);
         setSelectedMapping(null);
         resetForm();
-        setRefreshTrigger(prev => prev + 1); // Trigger refresh
+        setRefreshTrigger((prev) => prev + 1); // Trigger refresh
         setTimeout(() => setSuccess(""), 3000);
       } else {
         setError(data.error || "Failed to update position email mapping");
@@ -231,21 +234,26 @@ const Settings = ({ user, onBack }) => {
     try {
       console.log("Deleting mapping:", selectedMapping);
       const token = localStorage.getItem("token");
-      
+
       // Optimistically remove from UI first
       const mappingIdToDelete = selectedMapping._id;
-      setPositionMappings(prev => prev.filter(mapping => mapping._id !== mappingIdToDelete));
-      
-      const response = await fetch(`/api/management/position-emails/${mappingIdToDelete}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache",
-          "Expires": "0"
-        },
-      });
+      setPositionMappings((prev) =>
+        prev.filter((mapping) => mapping._id !== mappingIdToDelete)
+      );
+
+      const response = await fetch(
+        `/api/management/position-emails/${mappingIdToDelete}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
 
       console.log("Delete response status:", response.status);
       const responseData = await response.json();
@@ -255,22 +263,24 @@ const Settings = ({ user, onBack }) => {
         setSuccess("Position email mapping deleted successfully");
         setShowDeleteDialog(false);
         setSelectedMapping(null);
-        
+
         // Force refresh from server to ensure consistency
         console.log("Triggering refresh after successful delete...");
-        setRefreshTrigger(prev => prev + 1);
-        
+        setRefreshTrigger((prev) => prev + 1);
+
         setTimeout(() => setSuccess(""), 3000);
       } else {
         console.error("Delete failed:", responseData);
         // Revert optimistic update on failure
-        setRefreshTrigger(prev => prev + 1);
-        setError(responseData.error || "Failed to delete position email mapping");
+        setRefreshTrigger((prev) => prev + 1);
+        setError(
+          responseData.error || "Failed to delete position email mapping"
+        );
       }
     } catch (err) {
       console.error("Delete error:", err);
       // Revert optimistic update on error
-      setRefreshTrigger(prev => prev + 1);
+      setRefreshTrigger((prev) => prev + 1);
       setError(err.message);
     } finally {
       setActionLoading(false);
@@ -279,7 +289,7 @@ const Settings = ({ user, onBack }) => {
 
   const openEditModal = (mapping) => {
     setSelectedMapping(mapping);
-    
+
     setFormData({
       position: mapping.position,
       employeeName: mapping.employeeName,
@@ -348,11 +358,7 @@ const Settings = ({ user, onBack }) => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         {/* Error Alert */}
         {error && (
-          <Alert 
-            severity="error" 
-            sx={{ mb: 3 }}
-            onClose={clearError}
-          >
+          <Alert severity="error" sx={{ mb: 3 }} onClose={clearError}>
             {error}
           </Alert>
         )}
@@ -370,7 +376,7 @@ const Settings = ({ user, onBack }) => {
             <Typography variant="h6" gutterBottom>
               Current Position Email Mappings
             </Typography>
-            
+
             {loading ? (
               <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
                 <CircularProgress />
@@ -380,8 +386,13 @@ const Settings = ({ user, onBack }) => {
                 <Typography variant="h6" color="text.secondary" gutterBottom>
                   No Position Email Mappings Found
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Start by adding position-based email addresses for your organization.
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
+                  Start by adding position-based email addresses for your
+                  organization.
                 </Typography>
                 <Button
                   variant="contained"
@@ -417,7 +428,7 @@ const Settings = ({ user, onBack }) => {
                             color="primary"
                             variant="outlined"
                             size="small"
-                            sx={{pointerEvents: "none"}}
+                            sx={{ pointerEvents: "none" }}
                           />
                         </TableCell>
                         <TableCell>
@@ -437,7 +448,8 @@ const Settings = ({ user, onBack }) => {
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2">
-                            {mapping.createdBy?.firstName} {mapping.createdBy?.lastName}
+                            {mapping.createdBy?.firstName}{" "}
+                            {mapping.createdBy?.lastName}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -446,7 +458,13 @@ const Settings = ({ user, onBack }) => {
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
-                          <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              gap: 1,
+                              justifyContent: "center",
+                            }}
+                          >
                             <IconButton
                               size="small"
                               onClick={() => openEditModal(mapping)}
@@ -474,8 +492,8 @@ const Settings = ({ user, onBack }) => {
       </Container>
 
       {/* Add Position Modal */}
-      <Dialog 
-        open={showAddModal} 
+      <Dialog
+        open={showAddModal}
         onClose={() => setShowAddModal(false)}
         maxWidth="sm"
         fullWidth
@@ -485,7 +503,7 @@ const Settings = ({ user, onBack }) => {
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormControl fullWidth required>
+                <FormControl sx={{ width: "25vw" }} required>
                   <InputLabel>Position</InputLabel>
                   <Select
                     name="position"
@@ -500,37 +518,44 @@ const Settings = ({ user, onBack }) => {
                       <MenuItem disabled>No positions available</MenuItem>
                     ) : (
                       positions.map((positionGroup) => (
-                        <MenuItem key={positionGroup.position} value={positionGroup.position}>
-                          {positionGroup.position} ({positionGroup.employees.length} employees)
+                        <MenuItem
+                          key={positionGroup.position}
+                          value={positionGroup.position}
+                        >
+                          {positionGroup.position} (
+                          {positionGroup.employees.length} employees)
                         </MenuItem>
                       ))
                     )}
                   </Select>
                 </FormControl>
               </Grid>
-              
+
               {formData.position && (
                 <Grid item xs={12}>
-                  <FormControl fullWidth required>
+                  <FormControl sx={{ width: "30vw" }} required>
                     <InputLabel>Employee Name</InputLabel>
                     <Select
                       name="employeeName"
                       value={formData.employeeName}
                       onChange={(e) => {
+                        const selectedValue = e.target.value;
                         const selectedEmployee = positions
-                          .find(p => p.position === formData.position)
-                          ?.employees.find(emp => emp.name === e.target.value);
-                        
-                        setFormData(prev => ({
+                          .find((p) => p.position === formData.position)
+                          ?.employees.find(
+                            (emp) => emp.name === selectedValue
+                          );
+
+                        setFormData((prev) => ({
                           ...prev,
-                          employeeName: e.target.value,
-                          email: selectedEmployee?.email || ""
+                          employeeName: selectedValue,
+                          email: selectedEmployee?.email || prev.email,
                         }));
                       }}
                       label="Employee Name"
                     >
                       {positions
-                        .find(p => p.position === formData.position)
+                        .find((p) => p.position === formData.position)
                         ?.employees.map((employee) => (
                           <MenuItem key={employee._id} value={employee.name}>
                             {employee.name}
@@ -540,7 +565,7 @@ const Settings = ({ user, onBack }) => {
                   </FormControl>
                 </Grid>
               )}
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -587,8 +612,8 @@ const Settings = ({ user, onBack }) => {
       </Dialog>
 
       {/* Edit Position Modal */}
-      <Dialog 
-        open={showEditModal} 
+      <Dialog
+        open={showEditModal}
         onClose={() => setShowEditModal(false)}
         maxWidth="sm"
         fullWidth
@@ -598,7 +623,7 @@ const Settings = ({ user, onBack }) => {
           <Box sx={{ pt: 2 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <FormControl fullWidth required>
+                <FormControl sx={{ width: "30vw" }} required>
                   <InputLabel>Position</InputLabel>
                   <Select
                     name="position"
@@ -613,37 +638,37 @@ const Settings = ({ user, onBack }) => {
                       <MenuItem disabled>No positions available</MenuItem>
                     ) : (
                       positions.map((positionGroup) => (
-                        <MenuItem key={positionGroup.position} value={positionGroup.position}>
-                          {positionGroup.position} ({positionGroup.employees.length} employees)
+                        <MenuItem
+                          key={positionGroup.position}
+                          value={positionGroup.position}
+                        >
+                          {positionGroup.position} (
+                          {positionGroup.employees.length} employees)
                         </MenuItem>
                       ))
                     )}
                   </Select>
                 </FormControl>
               </Grid>
-              
+
               {formData.position && (
                 <Grid item xs={12}>
-                  <FormControl fullWidth required>
+                  <FormControl sx={{ width: "30vw" }} required>
                     <InputLabel>Employee Name</InputLabel>
                     <Select
                       name="employeeName"
                       value={formData.employeeName}
                       onChange={(e) => {
-                        const selectedEmployee = positions
-                          .find(p => p.position === formData.position)
-                          ?.employees.find(emp => emp.name === e.target.value);
-                        
-                        setFormData(prev => ({
+                        const selectedValue = e.target.value;
+                        setFormData((prev) => ({
                           ...prev,
-                          employeeName: e.target.value,
-                          // Don't auto-update email in edit mode unless explicitly changing employee
+                          employeeName: selectedValue,
                         }));
                       }}
                       label="Employee Name"
                     >
                       {positions
-                        .find(p => p.position === formData.position)
+                        .find((p) => p.position === formData.position)
                         ?.employees.map((employee) => (
                           <MenuItem key={employee._id} value={employee.name}>
                             {employee.name}
@@ -653,7 +678,7 @@ const Settings = ({ user, onBack }) => {
                   </FormControl>
                 </Grid>
               )}
-              
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -698,16 +723,16 @@ const Settings = ({ user, onBack }) => {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog 
-        open={showDeleteDialog} 
+      <Dialog
+        open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
         maxWidth="sm"
       >
         <DialogTitle>Delete Position Email Mapping</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the position email mapping for "{selectedMapping?.position}"?
-            This action cannot be undone.
+            Are you sure you want to delete the position email mapping for "
+            {selectedMapping?.position}"? This action cannot be undone.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 3 }}>

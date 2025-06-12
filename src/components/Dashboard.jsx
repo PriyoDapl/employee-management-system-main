@@ -14,7 +14,7 @@ import Layout from "./Layout";
 import ManagementDetails from "./ManagementDetails";
 import AllEmployees from "./AllEmployees";
 import ProjectsManagement from "./ProjectsManagement";
-import ProjectAssignments from "./ProjectAssignments";
+
 import TaskManagement from "./TaskManagement";
 import Settings from "./Settings";
 import MailManagement from "./MailManagement";
@@ -118,10 +118,6 @@ const Dashboard = ({ user, title, onLogout }) => {
             onBack={handleBackToDashboard}
             onProjectCountChange={handleProjectCountChange}
           />
-        );
-      case "assignments":
-        return (
-          <ProjectAssignments user={user} onBack={handleBackToDashboard} />
         );
       case "tasks":
         return (

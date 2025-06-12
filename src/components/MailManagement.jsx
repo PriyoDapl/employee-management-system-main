@@ -59,7 +59,7 @@ const MailManagement = ({ user, onBack }) => {
     requestType: "",
     subject: "",
     message: "",
-    selectedPositions: [],
+    selectedPosition: null,
     ccPositions: [],
     priority: "Medium",
   });
@@ -147,7 +147,7 @@ const MailManagement = ({ user, onBack }) => {
       requestType: "",
       subject: "",
       message: "",
-      selectedPositions: [],
+      selectedPosition: null,
       ccPositions: [],
       priority: "Medium",
     });
@@ -158,10 +158,10 @@ const MailManagement = ({ user, onBack }) => {
       !formData.requestType ||
       !formData.subject ||
       !formData.message ||
-      formData.selectedPositions.length === 0
+      !formData.selectedPosition
     ) {
       setError(
-        "Please fill in all required fields and select at least one recipient"
+        "Please fill in all required fields and select a recipient position"
       );
       return;
     }
@@ -173,7 +173,7 @@ const MailManagement = ({ user, onBack }) => {
       // Extract position IDs from selected position objects
       const requestData = {
         ...formData,
-        selectedPositions: formData.selectedPositions.map((pos) => pos._id),
+        selectedPositions: [formData.selectedPosition._id], // Convert single position to array for backend compatibility
         ccPositions: formData.ccPositions.map((pos) => pos._id),
       };
 
@@ -345,29 +345,18 @@ const MailManagement = ({ user, onBack }) => {
 
               <Grid item xs={12} md={6}>
                 <Autocomplete
-                  multiple
                   options={availablePositions}
                   getOptionLabel={(option) => option.position}
-                  value={formData.selectedPositions}
+                  value={formData.selectedPosition}
                   onChange={(event, newValue) =>
-                    handlePositionChange("selectedPositions", newValue)
-                  }
-                  renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                      <Chip
-                        variant="outlined"
-                        label={option.position}
-                        {...getTagProps({ index })}
-                        key={option._id}
-                      />
-                    ))
+                    handlePositionChange("selectedPosition", newValue)
                   }
                   renderInput={(params) => (
                     <TextField
                       {...params}
                       label="Send To Position (Required)"
-                      placeholder="Select positions to send to"
-                      required={formData.selectedPositions.length === 0}
+                      placeholder="Select position to send to"
+                      required={!formData.selectedPosition}
                       helperText="Select the position that should receive this mail"
                     />
                   )}
@@ -377,10 +366,10 @@ const MailManagement = ({ user, onBack }) => {
               <Grid item xs={12} md={6}>
                 <Autocomplete
                   multiple
-                  options={availablePositions}
-                  getOptionLabel={(option) =>
-                    `${option.position}${option.employeeName && option.employeeName !== "No Employee Assigned" ? ` (${option.employeeName})` : ""}`
-                  }
+                  options={availablePositions.filter(
+                    (pos) => !formData.selectedPosition || pos._id !== formData.selectedPosition._id
+                  )}
+                  getOptionLabel={(option) => option.position}
                   value={formData.ccPositions}
                   onChange={(event, newValue) =>
                     handlePositionChange("ccPositions", newValue)
@@ -389,7 +378,7 @@ const MailManagement = ({ user, onBack }) => {
                     value.map((option, index) => (
                       <Chip
                         variant="outlined"
-                        label={`${option.position}${option.employeeName && option.employeeName !== "No Employee Assigned" ? ` (${option.employeeName})` : ""}`}
+                        label={option.position}
                         {...getTagProps({ index })}
                         key={option._id}
                       />
@@ -532,14 +521,14 @@ const MailManagement = ({ user, onBack }) => {
                                 gap: 0.5,
                               }}
                             >
-                              {mail.recipients.map((recipient, index) => (
+                              {[...new Set(mail.recipients.map(recipient => recipient.position))].map((position, index) => (
                                 <Chip
                                   key={index}
                                   sx={{
                                     pointerEvents: "none",
                                     alignSelf: "flex-start",
                                   }}
-                                  label={recipient.position}
+                                  label={position}
                                   size="small"
                                   variant="outlined"
                                   color="primary"
@@ -553,8 +542,8 @@ const MailManagement = ({ user, onBack }) => {
                                     sx={{ mt: 0.5 }}
                                   >
                                     CC:{" "}
-                                    {mail.ccRecipients
-                                      .map((cc) => cc.position)
+                                    {[...new Set(mail.ccRecipients
+                                      .map((cc) => cc.position))]
                                       .join(", ")}
                                   </Typography>
                                 )}
@@ -668,10 +657,10 @@ const MailManagement = ({ user, onBack }) => {
                   <Box
                     sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}
                   >
-                    {selectedMail.recipients?.map((recipient, index) => (
+                    {[...new Set(selectedMail.recipients?.map(recipient => recipient.position) || [])].map((position, index) => (
                       <Chip
                         key={index}
-                        label={recipient.position}
+                        label={position}
                         size="small"
                         variant="outlined"
                         color="primary"
@@ -701,10 +690,10 @@ const MailManagement = ({ user, onBack }) => {
                           mt: 1,
                         }}
                       >
-                        {selectedMail.ccRecipients.map((cc, index) => (
+                        {[...new Set(selectedMail.ccRecipients.map(cc => cc.position))].map((position, index) => (
                           <Chip
                             key={index}
-                            label={cc.position}
+                            label={position}
                             size="small"
                             variant="outlined"
                             color="secondary"

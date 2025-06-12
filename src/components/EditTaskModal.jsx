@@ -192,7 +192,7 @@ const EditTaskModal = ({ open, onClose, onSuccess, task, projects, employees }) 
                     required
                     disabled={loading}
                     variant="outlined"
-                    placeholder="Enter a descriptive task title"
+                    placeholder="Less than 200 characters"
                   />
                 </Paper>
               </Grid>
@@ -210,12 +210,12 @@ const EditTaskModal = ({ open, onClose, onSuccess, task, projects, employees }) 
                     label="Task Description"
                     value={formData.description}
                     onChange={handleChange("description")}
-                    fullWidth
+                    sx={{ width: '30vw' }}
                     multiline
                     rows={4}
                     disabled={loading}
                     variant="outlined"
-                    placeholder="Provide detailed information about the task"
+                    placeholder="Provide task description, but cannot exceed 2000 characters"
                   />
                 </Paper>
               </Grid>
@@ -231,7 +231,7 @@ const EditTaskModal = ({ open, onClose, onSuccess, task, projects, employees }) 
                   </Box>
                   
                   <Grid container spacing={2}>
-                    <Grid item xs={12} md={6}>
+                    <Grid item sx={{ width: '20vw' }} xs={12} md={6}>
                       <Autocomplete
                         options={employees}
                         getOptionLabel={(option) => 
@@ -272,7 +272,7 @@ const EditTaskModal = ({ open, onClose, onSuccess, task, projects, employees }) 
                     </Grid>
 
                     <Grid item xs={12} md={6}>
-                      <FormControl fullWidth disabled={loading} required>
+                      <FormControl sx={{ width: '20vw' }} disabled={loading} required>
                         <InputLabel>Project</InputLabel>
                         <Select
                           value={formData.projectId}

@@ -22,6 +22,10 @@ import {
   DialogActions,
   FormControlLabel,
   Switch,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   Close as CloseIcon,
@@ -35,6 +39,7 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
     employeeId: "",
     department: "",
     position: "",
+    customPosition: "",
     salary: "",
     hireDate: "",
     phone: "",
@@ -46,7 +51,32 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [validationErrors, setValidationErrors] = useState({}); // Helper function to safely access nested employee data
+  const [validationErrors, setValidationErrors] = useState({});
+  const [showCustomPosition, setShowCustomPosition] = useState(false);
+
+  // Predefined positions for dropdown
+  const predefinedPositions = [
+    "Human Resource",
+    "Team Leader",
+    "Project Manager",
+    "Senior Developer",
+    "Junior Developer",
+    "Quality Assurance",
+    "Business Analyst",
+    "Data Scientist",
+    "UI/UX Designer",
+    "System Administrator",
+    "Network Engineer",
+    "DevOps Engineer",
+    "Technical Support",
+    "Sales Executive",
+    "Marketing Specialist",
+    "Customer Service",
+    "Trainee",
+    "Student",
+    "Intern",
+    "Others",
+  ]; // Helper function to safely access nested employee data
   const getEmployeeData = (employee) => {
     // Handle both direct employee object and employee with employeeData wrapper
     const empData = employee?.employeeData || employee;
@@ -59,6 +89,7 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
       employeeId: empData?.employeeId || employee?.employeeId || "",
       department: empData?.department || employee?.department || "",
       position: empData?.position || employee?.position || "",
+      customPosition: "", // Will be set below if needed
       salary: empData?.salary?.toString() || employee?.salary?.toString() || "",
       hireDate: empData?.hireDate
         ? new Date(empData.hireDate).toISOString().split("T")[0]
@@ -99,22 +130,69 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
           : true,
     };
 
+    // Handle custom positions if the position is not in predefined list
+    const predefinedPositions = [
+      "Human Resource",
+      "Team Leader",
+      "Project Manager",
+      "Senior Developer",
+      "Junior Developer",
+      "Quality Assurance",
+      "Business Analyst",
+      "Data Scientist",
+      "UI/UX Designer",
+      "System Administrator",
+      "Network Engineer",
+      "DevOps Engineer",
+      "Technical Support",
+      "Sales Executive",
+      "Marketing Specialist",
+      "Customer Service",
+      "Trainee",
+      "Student",
+      "Intern",
+      "Others",
+    ];
+
+    const position = result.position;
+    if (position && !predefinedPositions.includes(position)) {
+      result.position = "Others";
+      result.customPosition = position;
+    }
+
     return result;
   };
   useEffect(() => {
     if (employee) {
       const employeeData = getEmployeeData(employee);
       setFormData(employeeData);
+      setShowCustomPosition(employeeData.position === "Others");
     }
   }, [employee]);
   const handleChange = (e) => {
     const { name, value, checked, type } = e.target;
     const newValue = type === "checkbox" ? checked : value;
 
-    setFormData({
-      ...formData,
-      [name]: newValue,
-    });
+    if (name === "position") {
+      setShowCustomPosition(value === "Others");
+      if (value !== "Others") {
+        setFormData({
+          ...formData,
+          [name]: value,
+          customPosition: "", // Clear custom position when predefined is selected
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: newValue,
+      });
+    }
 
     // Clear field-specific validation error when user starts typing
     if (validationErrors[name]) {
@@ -142,6 +220,11 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
 
     if (!formData.position.trim()) {
       errors.position = "Position is required";
+    }
+
+    if (formData.position === "Others" && !formData.customPosition.trim()) {
+      errors.customPosition =
+        "Custom position is required when 'Others' is selected";
     }
 
     if (!formData.hireDate) {
@@ -182,8 +265,15 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
         .map((skill) => skill.trim())
         .filter((skill) => skill);
 
+      // Use custom position if "Others" is selected, otherwise use the selected position
+      const finalPosition =
+        formData.position === "Others"
+          ? formData.customPosition
+          : formData.position;
+
       const submissionData = {
         ...formData,
+        position: finalPosition,
         skills: skillsArray,
         salary: formData.salary ? parseFloat(formData.salary) : 0,
       };
@@ -458,23 +548,64 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
                       />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                      <TextField
+                      <FormControl
                         fullWidth
-                        name="position"
-                        label="Position *"
-                        value={formData.position}
-                        onChange={handleChange}
-                        variant="outlined"
                         required
                         error={!!validationErrors.position}
-                        helperText={validationErrors.position}
-                        sx={{
-                          "& .MuiOutlinedInput-root": {
+                      >
+                        <InputLabel>Position *</InputLabel>
+                        <Select
+                          name="position"
+                          value={formData.position}
+                          onChange={handleChange}
+                          label="Position *"
+                          sx={{
                             borderRadius: 2,
-                          },
-                        }}
-                      />
+                          }}
+                        >
+                          {predefinedPositions.map((position) => (
+                            <MenuItem key={position} value={position}>
+                              {position}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {validationErrors.position && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{ mt: 0.5, ml: 1 }}
+                          >
+                            {validationErrors.position}
+                          </Typography>
+                        )}
+                      </FormControl>
                     </Grid>
+
+                    {/* Custom Position Field - Only show when "Others" is selected */}
+                    {showCustomPosition && (
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          name="customPosition"
+                          label="Custom Position *"
+                          value={formData.customPosition}
+                          onChange={handleChange}
+                          variant="outlined"
+                          required
+                          error={!!validationErrors.customPosition}
+                          helperText={
+                            validationErrors.customPosition ||
+                            "Enter custom position title"
+                          }
+                          placeholder="Enter custom position title"
+                          sx={{
+                            "& .MuiOutlinedInput-root": {
+                              borderRadius: 2,
+                            },
+                          }}
+                        />
+                      </Grid>
+                    )}
                     <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
@@ -683,7 +814,7 @@ const ManagementEmployeeEdit = ({ employee, onClose, onSave }) => {
                             color={formData.isActive ? "success" : "error"}
                             variant="filled"
                             size="medium"
-                            sx={{ fontWeight: 600 , pointerEvents: "none" }}
+                            sx={{ fontWeight: 600, pointerEvents: "none" }}
                           />
                         </Box>
                       }

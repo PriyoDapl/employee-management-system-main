@@ -29,6 +29,8 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBackIos";
 import EditIcon from "@mui/icons-material/Edit";
+import InfoIcon from "@mui/icons-material/Info";
+import ProjectManagementDetailsModal from "./ProjectManagementDetailsModal";
 
 const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
   const [projects, setProjects] = useState([]);
@@ -42,6 +44,9 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
   });
   const [showInactive, setShowInactive] = useState(false);
   const [viewFilter, setViewFilter] = useState("active");
+  const [assignedFilter, setAssignedFilter] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     details: "",
@@ -236,13 +241,33 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
     }
   };
 
+  const handleViewDetails = (project) => {
+    setSelectedProject(project);
+    setShowDetailsModal(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setSelectedProject(null);
+    setShowDetailsModal(false);
+  };
+
   const getFilteredProjects = () => {
+    let filtered = projects;
+    
+    // Apply status filter (active/inactive/all)
     if (viewFilter === "active") {
-      return projects.filter((p) => p.isActive !== false);
+      filtered = filtered.filter((p) => p.isActive !== false);
     } else if (viewFilter === "inactive") {
-      return projects.filter((p) => p.isActive === false);
+      filtered = filtered.filter((p) => p.isActive === false);
     }
-    return projects; // 'all'
+    // 'all' shows everything, no additional filtering needed
+    
+    // Apply assigned filter if enabled
+    if (assignedFilter) {
+      filtered = filtered.filter((p) => p.hasAssignments);
+    }
+    
+    return filtered;
   };
 
   const filteredProjects = getFilteredProjects();
@@ -398,37 +423,58 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
               Projects ({filteredProjects.length})
             </Typography>
 
-            <ToggleButtonGroup
-              value={viewFilter}
-              exclusive
-              onChange={handleViewFilterChange}
-              aria-label="project filter"
-              size="small"
-              sx={{
-                "& .MuiToggleButton-root": {
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 500,
-                  padding: "6px 12px",
-                  marginRight: 0.5,
-                  border: "1px solid",
-                  borderColor: "grey.300",
-                },
-                "& .MuiToggleButton-root:last-of-type": {
-                  marginRight: 0,
-                },
-              }}
-            >
-              <ToggleButton value="all" aria-label="all projects">
-                All
-              </ToggleButton>
-              <ToggleButton value="active" aria-label="active projects">
-                Active
-              </ToggleButton>
-              <ToggleButton value="inactive" aria-label="inactive projects">
-                Inactive
-              </ToggleButton>
-            </ToggleButtonGroup>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              {/* Assigned Filter Toggle */}
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={assignedFilter}
+                    onChange={(e) => setAssignedFilter(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Show only assigned"
+                sx={{
+                  "& .MuiFormControlLabel-label": {
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                  },
+                }}
+              />
+
+              {/* Status Filter Toggle Group */}
+              <ToggleButtonGroup
+                value={viewFilter}
+                exclusive
+                onChange={handleViewFilterChange}
+                aria-label="project filter"
+                size="small"
+                sx={{
+                  "& .MuiToggleButton-root": {
+                    borderRadius: 2,
+                    textTransform: "none",
+                    fontWeight: 500,
+                    padding: "6px 12px",
+                    marginRight: 0.5,
+                    border: "1px solid",
+                    borderColor: "grey.300",
+                  },
+                  "& .MuiToggleButton-root:last-of-type": {
+                    marginRight: 0,
+                  },
+                }}
+              >
+                <ToggleButton value="all" aria-label="all projects">
+                  All
+                </ToggleButton>
+                <ToggleButton value="active" aria-label="active projects">
+                  Open
+                </ToggleButton>
+                <ToggleButton value="inactive" aria-label="inactive projects">
+                  Closed
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
           </Box>
 
           {loading && projects.length === 0 ? (
@@ -441,14 +487,18 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
           ) : filteredProjects.length === 0 ? (
             <Paper sx={{ textAlign: "center", py: 6 }}>
               <Typography color="text.secondary" sx={{ mb: 1 }}>
-                {viewFilter === "active"
+                {assignedFilter
+                  ? "No assigned projects found."
+                  : viewFilter === "active"
                   ? "No active projects found."
                   : viewFilter === "inactive"
                   ? "No inactive projects found."
                   : "No projects created yet."}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {viewFilter === "active" || viewFilter === "all"
+                {assignedFilter
+                  ? "No projects have employees assigned yet. Assign employees to projects to see them here."
+                  : viewFilter === "active" || viewFilter === "all"
                   ? "Create your first project using the form above."
                   : "Switch to 'Active' or 'All' to see available projects."}
               </Typography>
@@ -491,16 +541,27 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                         >
                           {project.name}
                         </Typography>
-                        <Chip
-                          label={
-                            project.isActive === false ? "Inactive" : "Active"
-                          }
-                          color={
-                            project.isActive === false ? "default" : "success"
-                          }
-                          size="small"
-                          sx={{ ml: 1, fontWeight: 500, pointerEvents: "none" }}
-                        />
+                        <Box sx={{ display: "flex", gap: 1, ml: 1 }}>
+                          {project.assignmentCount > 0 && (
+                            <Chip
+                              label={`${project.assignmentCount} assigned`}
+                              size="small"
+                              color="info"
+                              variant="outlined"
+                              sx={{ fontWeight: 500, pointerEvents: "none" }}
+                            />
+                          )}
+                          <Chip
+                            label={
+                              project.isActive === false ? "Inactive" : "Active"
+                            }
+                            color={
+                              project.isActive === false ? "default" : "success"
+                            }
+                            size="small"
+                            sx={{ fontWeight: 500, pointerEvents: "none" }}
+                          />
+                        </Box>
                       </Box>
 
                       <Typography
@@ -537,7 +598,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
 
                     <Box sx={{ p: 2, display: "flex", gap: 1 }}>
                       <Button
-                        fullWidth
+                        flex="1"
                         variant="outlined"
                         startIcon={<EditIcon />}
                         onClick={() => handleEdit(project)}
@@ -547,12 +608,30 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                           borderRadius: 2,
                           textTransform: "none",
                           fontWeight: 500,
+                          minWidth: 0,
                         }}
                       >
                         Edit
                       </Button>
                       <Button
-                        fullWidth
+                        flex="1"
+                        variant="outlined"
+                        startIcon={<InfoIcon />}
+                        onClick={() => handleViewDetails(project)}
+                        disabled={loading}
+                        size="small"
+                        color="info"
+                        sx={{
+                          borderRadius: 2,
+                          textTransform: "none",
+                          fontWeight: 500,
+                          minWidth: 0,
+                        }}
+                      >
+                        Details
+                      </Button>
+                      <Button
+                        flex="1"
                         variant="outlined"
                         color={
                           project.isActive === false ? "success" : "warning"
@@ -564,6 +643,7 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
                           borderRadius: 2,
                           textTransform: "none",
                           fontWeight: 500,
+                          minWidth: 0,
                         }}
                       >
                         {project.isActive === false ? "Open" : "Close"}
@@ -635,6 +715,14 @@ const ProjectsManagement = ({ user, onBack, onProjectCountChange }) => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Project Details Modal */}
+        <ProjectManagementDetailsModal
+          project={selectedProject}
+          open={showDetailsModal}
+          onClose={handleCloseDetailsModal}
+          onRefresh={fetchProjects}
+        />
       </Container>
     </Box>
   );

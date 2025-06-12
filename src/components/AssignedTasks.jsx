@@ -645,6 +645,27 @@ const TaskDetailModal = ({ task, open, onClose, onStatusUpdate, loading }) => {
     }
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Assigned": return "default";
+      case "In Progress": return "primary";
+      case "On Hold": return "warning";
+      case "Under Review": return "info";
+      case "Completed": return "success";
+      default: return "default";
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "Low": return "success";
+      case "Medium": return "warning";
+      case "High": return "error";
+      case "Critical": return "error";
+      default: return "default";
+    }
+  };
+
   if (!task) return null;
 
   const availableStatuses = {

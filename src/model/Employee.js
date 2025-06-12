@@ -66,6 +66,13 @@ const employeeSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  profileCompleted: {
+    type: Boolean,
+    default: false,
+  },
+  profileCompletedAt: {
+    type: Date,
+  },
 }, {
   timestamps: true,
 });

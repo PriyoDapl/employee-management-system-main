@@ -36,7 +36,7 @@ import {
   Task as TaskIcon,
   Mail as MailIcon,
   AlternateEmail as MailAltIcon,
-  Send
+  Send,
 } from "@mui/icons-material";
 
 const Sidebar = ({
@@ -73,7 +73,7 @@ const Sidebar = ({
   const shouldShowSidebar = isMobile ? isOpen : true;
 
   const handleSubmenuToggle = (menuName) => {
-    if (isCollapsed) return; 
+    if (isCollapsed) return;
     setOpenSubmenu(openSubmenu === menuName ? "" : menuName);
   };
 
@@ -145,22 +145,21 @@ const Sidebar = ({
       badge: taskCount?.toString() || "0",
     },
     {
-      id: "mailmanagement",
-      text: "Send Mail",
-      icon: <Send />,
-      view: "mailmanagement",
-    },
-    {
-      id: "inbox",
-      text: "Inbox",
+      id: "mailing",
+      text: "Mailing",
       icon: <MailIcon />,
-      view: "inbox",
-    },
-    {
-      id: "schedule",
-      text: "Schedule",
-      icon: <ScheduleIcon />,
-      view: "schedule",
+      submenu: [
+        {
+          id: "mailmanagement",
+          text: "Send Mail",
+          view: "mailmanagement",
+        },
+        {
+          id: "inbox",
+          text: "Inbox",
+          view: "inbox",
+        },
+      ],
     },
     {
       id: "reports",
@@ -196,12 +195,6 @@ const Sidebar = ({
       badge: projectCount?.toString() || "0",
     },
     {
-      id: "assignments",
-      text: "Project Assignments",
-      icon: <AssignmentsIcon />,
-      view: "assignments",
-    },
-    {
       id: "tasks",
       text: "Task Management",
       icon: <TaskIcon />,
@@ -209,36 +202,20 @@ const Sidebar = ({
       badge: taskCount?.toString() || "0",
     },
     {
-      id: "mailmanagement",
-      text: "Send Mail",
-      icon: <Send />,
-      view: "mailmanagement",
-    },
-    {
-      id: "inbox",
-      text: "Inbox",
+      id: "mailing",
+      text: "Mailing",
       icon: <MailIcon />,
-      view: "inbox",
-    },
-    {
-      id: "departments",
-      text: "Departments",
-      icon: <CompanyIcon />,
       submenu: [
-        { id: "hr", text: "Human Resources", view: "hr" },
-        { id: "it", text: "IT Department", view: "it" },
-        { id: "finance", text: "Finance", view: "finance" },
-        { id: "marketing", text: "Marketing", view: "marketing" },
-      ],
-    },
-    {
-      id: "analytics",
-      text: "Analytics",
-      icon: <AnalyticsIcon />,
-      submenu: [
-        { id: "performance", text: "Performance", view: "performance" },
-        { id: "productivity", text: "Productivity", view: "productivity" },
-        { id: "attendance", text: "Attendance", view: "attendance" },
+        {
+          id: "mailmanagement",
+          text: "Send Mail",
+          view: "mailmanagement",
+        },
+        {
+          id: "inbox",
+          text: "Inbox",
+          view: "inbox",
+        },
       ],
     },
     {
@@ -279,8 +256,8 @@ const Sidebar = ({
               }}
               sx={{
                 py: 1.5,
-                px: isCollapsed ? 1 : 2,
-                mx: 1,
+                px: isCollapsed ? 0.5 : 1,
+                mx: 0.5,
                 borderRadius: 2,
                 bgcolor: isActive ? "primary.main" : "transparent",
                 color: isActive ? "white" : "text.primary",
@@ -357,7 +334,7 @@ const Sidebar = ({
                         bgcolor: isActive
                           ? "rgba(255,255,255,0.2)"
                           : "primary.main",
-                          pointerEvents: "none",
+                        pointerEvents: "none",
                         color: "white",
                         mr: hasSubmenu ? 1 : 0,
                         cursor: "pointer",
@@ -390,9 +367,9 @@ const Sidebar = ({
                       onClick={() => onViewChange(subItem.view)}
                       sx={{
                         py: 1,
-                        pl: 6,
-                        pr: 2,
-                        mx: 1,
+                        pl: 4,
+                        pr: 1,
+                        mx: 0.5,
                         borderRadius: 2,
                         bgcolor: isSubActive ? "primary.light" : "transparent",
                         color: isSubActive ? "white" : "text.primary",
@@ -585,7 +562,7 @@ const Sidebar = ({
                         }}
                         sx={{
                           py: 0.75,
-                          px: 1.5,
+                          px: 1,
                           borderRadius: 1,
                           bgcolor: isSubActive
                             ? "primary.light"

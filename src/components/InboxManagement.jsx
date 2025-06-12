@@ -150,8 +150,8 @@ const InboxManagement = ({ user, onBack }) => {
             {/* User Position Info */}
             <Alert severity="info" sx={{ mb: 3 }}>
               <Typography variant="body2">
-                <strong>Position-Based Inbox:</strong> You receive mails sent to your current position. 
-                {user?.role === "management" && " As management, you may have access to multiple positions."}
+                <strong>Position-Based Inbox:</strong> You receive mails sent to your current position. To know your current position, please check your profile.
+                {user?.role === "management" && " As management, you can view all emails with complete recipient details including TO and CC recipients."}
               </Typography>
             </Alert>
 
@@ -180,7 +180,6 @@ const InboxManagement = ({ user, onBack }) => {
                       <TableCell>From</TableCell>
                       <TableCell>Request Type</TableCell>
                       <TableCell>Subject</TableCell>
-                      <TableCell>Recipient Type</TableCell>
                       <TableCell>Priority</TableCell>
                       <TableCell>Actions</TableCell>
                     </TableRow>
@@ -220,15 +219,6 @@ const InboxManagement = ({ user, onBack }) => {
                           <Typography variant="body2">
                             {mail.subject}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={mail.recipientType || "TO"}
-                            color={mail.recipientType === "CC" ? "secondary" : "primary"}
-                            size="small"
-                            variant="filled"
-                            sx={{ pointerEvents: "none" }}
-                          />
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -334,6 +324,54 @@ const InboxManagement = ({ user, onBack }) => {
                     {selectedMail.subject}
                   </Typography>
                 </Grid>
+                {user?.role === "management" && (
+                  <>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Recipients (TO)
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        {selectedMail.recipients && selectedMail.recipients.length > 0 ? (
+                          [...new Set(selectedMail.recipients.map(recipient => recipient.position))].map((position, index) => (
+                            <Chip
+                              key={index}
+                              label={position}
+                              color="primary"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            No recipients
+                          </Typography>
+                        )}
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        CC Recipients
+                      </Typography>
+                      <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", gap: 1 }}>
+                        {selectedMail.ccRecipients && selectedMail.ccRecipients.length > 0 ? (
+                          [...new Set(selectedMail.ccRecipients.map(ccRecipient => ccRecipient.position))].map((position, index) => (
+                            <Chip
+                              key={index}
+                              label={position}
+                              color="secondary"
+                              variant="outlined"
+                              size="small"
+                            />
+                          ))
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            No CC recipients
+                          </Typography>
+                        )}
+                      </Box>
+                    </Grid>
+                  </>
+                )}
                 <Grid item xs={12}>
                   <Typography variant="subtitle2" color="text.secondary">
                     Message

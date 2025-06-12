@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Project from '@/model/Project';
+import ProjectAssignment from '@/model/ProjectAssignment';
 import { verifyToken, getTokenFromHeaders } from '@/lib/auth';
 
 // Helper function to get and verify token from request
@@ -34,9 +35,23 @@ export async function GET(request) {
     const projects = await Project.find(filter)
       .sort({ createdAt: -1 });
 
+    // Get assignment counts for each project
+    const projectsWithAssignments = await Promise.all(
+      projects.map(async (project) => {
+        const assignmentCount = await ProjectAssignment.countDocuments({
+          projectId: project._id
+        });
+        return {
+          ...project.toObject(),
+          assignmentCount,
+          hasAssignments: assignmentCount > 0
+        };
+      })
+    );
+
     return NextResponse.json({
       success: true,
-      projects
+      projects: projectsWithAssignments
     });
 
   } catch (error) {
