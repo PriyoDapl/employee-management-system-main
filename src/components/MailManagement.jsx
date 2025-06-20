@@ -189,10 +189,21 @@ const MailManagement = ({ user, onBack }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess("Mail sent successfully!");
+        let successMessage = "Mail sent successfully!";
+        if (data.emailResults) {
+          const { sent = 0, failed = 0 } = data.emailResults;
+          if (sent > 0 && failed === 0) {
+            successMessage += ` Email delivered to ${sent} recipient(s).`;
+          } else if (sent > 0 && failed > 0) {
+            successMessage += ` Email delivered to ${sent} recipient(s), ${failed} failed.`;
+          } else if (failed > 0) {
+            successMessage += ` Warning: Email delivery failed for ${failed} recipient(s).`;
+          }
+        }
+        setSuccess(successMessage);
         resetForm();
         fetchMailHistory();
-        setTimeout(() => setSuccess(""), 5000);
+        setTimeout(() => setSuccess(""), 7000);
       } else {
         setError(data.error || "Failed to send mail");
       }
@@ -564,14 +575,29 @@ const MailManagement = ({ user, onBack }) => {
                             />
                           </TableCell>
                           <TableCell>
-                            <Chip
-                              label={mail.status}
-                              color={
-                                mail.status === "Sent" ? "success" : "default"
-                              }
-                              size="small"
-                              sx={{ pointerEvents: "none" }}
-                            />
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                              <Chip
+                                label={mail.status}
+                                color={
+                                  mail.status === "Sent" ? "success" : "default"
+                                }
+                                size="small"
+                                sx={{ pointerEvents: "none" }}
+                              />
+                              {mail.emailStatus && (
+                                <Chip
+                                  label={`Email: ${mail.emailStatus}`}
+                                  color={
+                                    mail.emailStatus === "Sent" ? "success" :
+                                    mail.emailStatus === "Partially Sent" ? "warning" :
+                                    mail.emailStatus === "Failed" ? "error" : "default"
+                                  }
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ pointerEvents: "none" }}
+                                />
+                              )}
+                            </Box>
                           </TableCell>
                           <TableCell>
                             <Button

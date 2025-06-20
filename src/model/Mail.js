@@ -69,6 +69,32 @@ const mailSchema = new mongoose.Schema({
     enum: ['Low', 'Medium', 'High'],
     default: 'Medium',
   },
+  emailStatus: {
+    type: String,
+    enum: ['Not Sent', 'Sent', 'Partially Sent', 'Failed'],
+    default: 'Not Sent',
+  },
+  emailResults: {
+    sent: [{
+      type: {
+        type: String,
+        enum: ['TO', 'CC', 'CC_ONLY']
+      },
+      recipients: [String],
+      cc: [String],
+      messageId: String,
+      sentAt: Date
+    }],
+    failed: [{
+      type: {
+        type: String,
+        enum: ['TO', 'CC', 'CC_ONLY', 'SYSTEM_ERROR']
+      },
+      recipients: [String],
+      error: String,
+      failedAt: Date
+    }]
+  },
   isActive: {
     type: Boolean,
     default: true,
@@ -80,6 +106,7 @@ const mailSchema = new mongoose.Schema({
 mailSchema.index({ senderUserId: 1, createdAt: -1 });
 mailSchema.index({ requestType: 1, createdAt: -1 });
 mailSchema.index({ status: 1, createdAt: -1 });
+mailSchema.index({ emailStatus: 1, createdAt: -1 });
 mailSchema.index({ 'recipients.position': 1 });
 mailSchema.index({ 'ccRecipients.position': 1 });
 mailSchema.index({ isActive: 1, createdAt: -1 });
